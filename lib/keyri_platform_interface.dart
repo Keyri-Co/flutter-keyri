@@ -24,7 +24,8 @@ abstract class KeyriPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<bool> easyKeyriAuth(String appKey, String payload, String? publicUserId) {
+  Future<bool> easyKeyriAuth(
+      String appKey, String payload, String? publicUserId) {
     throw UnimplementedError('easyKeyriAuth() has not been implemented.');
   }
 

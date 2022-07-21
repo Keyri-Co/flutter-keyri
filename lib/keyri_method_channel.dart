@@ -12,7 +12,8 @@ class MethodChannelKeyri extends KeyriPlatform {
   final methodChannel = const MethodChannel('keyri');
 
   @override
-  Future<bool> easyKeyriAuth(String appKey, String payload, String? publicUserId) async {
+  Future<bool> easyKeyriAuth(
+      String appKey, String payload, String? publicUserId) async {
     return await methodChannel.invokeMethod<bool>('easyKeyriAuth', {
       'appKey': appKey,
       'payload': payload,
