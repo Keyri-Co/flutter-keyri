@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:keyri/keyri.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -77,7 +77,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
     final msg = jsonEncode(
         {"email": "a.kuliahin@csn.khai.edu", "password": "4Science#"});
 
-    var response = await http.post(url, headers: headers, body: msg);
+    var response = await post(url, headers: headers, body: msg);
 
     if (response.statusCode == 200) {
       var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
