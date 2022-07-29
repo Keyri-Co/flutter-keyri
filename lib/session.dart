@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Session {
   Session(
       this.widgetOrigin,
@@ -8,8 +10,7 @@ class Session {
       this.riskAnalytics,
       this.publicUserId);
 
-  final String?
-   widgetOrigin;
+  final String? widgetOrigin;
   final String sessionId;
   final WidgetUserAgent? widgetUserAgent;
   final String iPAddressMobile;
@@ -18,9 +19,18 @@ class Session {
   final String? publicUserId;
 
   static Session fromJson(dynamic json) {
-    var widgetUserAgentJson = json['WidgetUserAgent'];
-    var riskAnalyticsJson = json['riskAnalytics'];
+    dynamic jsonData;
+    try {
+          String jsonDataString = json.toString();
+          jsonData = jsonDecode(jsonDataString);
+    } catch(e){
+      jsonData = json;
+    }
 
+    var widgetUserAgentJson = jsonData['widgetUserAgent'];
+    widgetUserAgentJson ??= jsonData['WidgetUserAgent'];
+
+    var riskAnalyticsJson = jsonData['riskAnalytics'];
     WidgetUserAgent? widgetUserAgent;
     RiskAnalytics? riskAnalytics;
 
@@ -32,21 +42,20 @@ class Session {
       riskAnalytics = RiskAnalytics.fromJson(riskAnalyticsJson);
     }
 
-    String? ipaddressMobile  = json['iPAddressMobile'] as String?;
-    ipaddressMobile ??= json['IPAddressMobile'] as String?;
+    String? ipaddressMobile = jsonData['iPAddressMobile'] as String?;
+    ipaddressMobile ??= jsonData['IPAddressMobile'] as String?;
 
-    String? ipaddressWidget = json['iPAddressWidget'] as String?;
-    ipaddressWidget ??= json['IPAddressWidget'] as String?;
-
+    String? ipaddressWidget = jsonData['iPAddressWidget'] as String?;
+    ipaddressWidget ??= jsonData['IPAddressWidget'] as String?;
 
     return Session(
-      json['widgetOrigin'] as String?,
-      json['sessionId'] as String,
+      jsonData['widgetOrigin'] as String?,
+      jsonData['sessionId'] as String,
       widgetUserAgent,
       ipaddressMobile ?? "",
       ipaddressWidget ?? "",
       riskAnalytics,
-      json['publicUserId'] as String?,
+      jsonData['publicUserId'] as String?,
     );
   }
 }
@@ -66,8 +75,7 @@ class WidgetUserAgent {
 }
 
 class RiskAnalytics {
-  RiskAnalytics(
-      this.riskStatus, this.riskFlagString, this.geoData);
+  RiskAnalytics(this.riskStatus, this.riskFlagString, this.geoData);
 
   final String? riskStatus;
   final String? riskFlagString;
@@ -81,10 +89,8 @@ class RiskAnalytics {
       geoData = GeoData.fromJson(geoDataJson);
     }
 
-    return RiskAnalytics(
-        json['riskStatus'] as String?,
-        json['riskFlagString'] as String?,
-        geoData);
+    return RiskAnalytics(json['riskStatus'] as String?,
+        json['riskFlagString'] as String?, geoData);
   }
 }
 

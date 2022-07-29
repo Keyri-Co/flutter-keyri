@@ -33,7 +33,7 @@ PODS:
   - keyri (0.0.1):
     - Flutter
     - keyri-pod
-  - keyri-pod (1.2.0)
+  - keyri-pod (1.2.3)
   - MLImage (1.0.0-beta2)
   - MLKitBarcodeScanning (1.7.0):
     - MLKitCommon (~> 5.0)
@@ -104,7 +104,7 @@ SPEC CHECKSUMS:
   GoogleUtilitiesComponents: 679b2c881db3b615a2777504623df6122dd20afe
   GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   keyri: 11228fae015bef060de52317ab7a6dd2224d9d89
-  keyri-pod: b3a1fb9c7b827fb81bb8dad93d121a4252e534c3
+  keyri-pod: 12cb64d3c339ac69206f7ac65fe668ca7c1c7cc3
   MLImage: a454f9f8ecfd537783a12f9488f5be1a68820829
   MLKitBarcodeScanning: b8257854f6afc1c8443d61ec6b98c28b35625df6
   MLKitCommon: 3bc17c6f7d25ce3660f030350b46ae7ec9ebca6e
