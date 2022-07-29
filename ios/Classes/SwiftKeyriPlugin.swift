@@ -81,6 +81,21 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                 result(false)
             }
         }
+        
+        if call.method == "getAssociationKey" {
+            if let args = call.arguments as? [String: String],
+               let user = args["publicUserId"] {
+                result(try? keyri.getAssociationKey(username:user)?.derRepresentation.base64EncodedString)
+            }
+        }
+        
+        if call.method == "generateAssociationKey" {
+            if let args = call.arguments as? [String: String],
+               let user = args["publicUserId"] {
+                result(try? keyri.getAssociationKey(username:user)?.derRepresentation.base64EncodedString)
+            }
+        }
+
 
     }
 }
