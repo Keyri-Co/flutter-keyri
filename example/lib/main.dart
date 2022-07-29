@@ -51,7 +51,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   void _easyKeyriAuth() async {
     await keyri
         .easyKeyriAuth(appKey, 'Some payload', 'Public user ID')
-        .then((authResult) => _onAuthResult(authResult))
+        .then((authResult) => _onAuthResult(authResult == true ? true : false))
         .catchError((error, stackTrace) => _onError(error));
   }
 
@@ -65,7 +65,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   void _onAuthResult(bool result) {
     String text;
-
+    print(result);
     if (result) {
       text = 'Successfully authenticated!';
     } else {
