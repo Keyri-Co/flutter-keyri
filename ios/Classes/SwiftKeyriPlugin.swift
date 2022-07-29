@@ -23,14 +23,11 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     result(didSucceed)
                 }
             }
-            
-            
-
         }
         
         if call.method == "initiateQrSession" {
             if let args = call.arguments as? [String: String],
-               let username = args["username"],
+               let username = args["publicUserId"],
                let sessionId = args["sessionId"],
                let appKey = args["appKey"] {
                 keyri.initializeQrSession(username: username, sessionId: sessionId, appKey: appKey) { returnedSession in
@@ -38,6 +35,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     case .failure(let error):
                         result(error.localizedDescription)
                     case .success(let session):
+                        self.activeSession = session
                         result(session.asDictionary())
                     }
                     
@@ -63,6 +61,22 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                let sessionId = args["sessionId"] {
                 activeSession?.deny()
                 result(true)
+            } else {
+                result(false)
+            }
+        }
+        
+        if call.method == "initializeDefaultScreen" {
+            if let session = self.activeSession,
+               let args = call.arguments as? [String: String],
+               let payload = args["payload"] {
+                session.payload = payload
+                let vc = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.rootViewController
+                let cs = ConfirmationScreenUIView(session: session) { bool in
+                    vc?.dismiss(animated: true)
+                    result(bool)
+                }
+                vc!.present(cs.vc, animated: true)
             } else {
                 result(false)
             }

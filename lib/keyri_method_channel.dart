@@ -58,30 +58,37 @@ class MethodChannelKeyri extends KeyriPlatform {
       'publicUserId': publicUserId
     });
 
-    return Session.fromJson(jsonDecode(sessionObject));
+    Session session = Session.fromJson(sessionObject);
+    return session;
   }
 
   @override
   Future<bool> initializeDefaultScreen(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<bool>('initializeDefaultScreen', {
+    print("called");
+    bool? value =  await methodChannel.invokeMethod<bool>('initializeDefaultScreen', {
       'sessionId': sessionId,
       'payload': payload
-    }).then<bool>((bool? value) => value ?? false);
+    });
+    return value ?? false;
   }
 
   @override
   Future<bool> confirmSession(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<bool>('confirmSession', {
+    bool? value = await methodChannel.invokeMethod<bool>('confirmSession', {
       'sessionId': sessionId,
       'payload': payload
-    }).then<bool>((bool? value) => value ?? false);
+    });
+
+    return value ?? false;
   }
 
   @override
   Future<bool> denySession(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<bool>('denySession', {
+    bool? value = await methodChannel.invokeMethod<bool>('denySession', {
       'sessionId': sessionId,
       'payload': payload
-    }).then<bool>((bool? value) => value ?? false);
+    });
+
+    return value ?? false;
   }
 }

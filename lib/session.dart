@@ -3,49 +3,54 @@ class Session {
       this.widgetOrigin,
       this.sessionId,
       this.widgetUserAgent,
-      this.userParameters,
       this.iPAddressMobile,
       this.iPAddressWidget,
       this.riskAnalytics,
       this.publicUserId);
 
-  final String widgetOrigin;
+  final String?
+   widgetOrigin;
   final String sessionId;
   final WidgetUserAgent? widgetUserAgent;
-  final UserParameters? userParameters;
   final String iPAddressMobile;
   final String iPAddressWidget;
   final RiskAnalytics? riskAnalytics;
   final String? publicUserId;
 
   static Session fromJson(dynamic json) {
-    var widgetUserAgentJson = json['widgetUserAgent'];
+    var widgetUserAgentJson = json['WidgetUserAgent'];
+    print(widgetUserAgentJson);
     var userParametersJson = json['userParameters'];
     var riskAnalyticsJson = json['riskAnalytics'];
 
     WidgetUserAgent? widgetUserAgent;
-    UserParameters? userParameters;
     RiskAnalytics? riskAnalytics;
 
     if (widgetUserAgentJson != null) {
       widgetUserAgent = WidgetUserAgent.fromJson(widgetUserAgentJson);
     }
 
-    if (userParametersJson != null) {
-      userParameters = UserParameters.fromJson(userParametersJson);
-    }
-
     if (riskAnalyticsJson != null) {
       riskAnalytics = RiskAnalytics.fromJson(riskAnalyticsJson);
     }
 
+    String? ipaddressMobile  = json['iPAddressMobile'] as String?;
+    if (ipaddressMobile == null) {
+      ipaddressMobile = json['IPAddressMobile'] as String?;
+    }
+
+    String? ipaddressWidget = json['iPAddressWidget'] as String?;
+    if (ipaddressWidget == null) {
+      ipaddressMobile = json['IPAddressWidget'] as String?;
+    }
+
+
     return Session(
-      json['widgetOrigin'] as String,
+      json['widgetOrigin'] as String?,
       json['sessionId'] as String,
       widgetUserAgent,
-      userParameters,
-      json['iPAddressMobile'] as String,
-      json['iPAddressWidget'] as String,
+      ipaddressMobile ?? "",
+      ipaddressWidget ?? "",
       riskAnalytics,
       json['publicUserId'] as String?,
     );
@@ -53,43 +58,29 @@ class Session {
 }
 
 class WidgetUserAgent {
-  WidgetUserAgent(this.isDesktop, this.os, this.browser);
+  WidgetUserAgent(this.os, this.browser);
 
-  final bool isDesktop;
   final String os;
   final String browser;
 
   static WidgetUserAgent fromJson(dynamic json) {
     return WidgetUserAgent(
-      json['isDesktop'] as bool,
       json['os'] as String,
       json['browser'] as String,
     );
   }
 }
 
-class UserParameters {
-  UserParameters(this.custom);
-
-  final String? custom;
-
-  static UserParameters fromJson(dynamic json) {
-    return UserParameters(json['custom'] as String?);
-  }
-}
-
 class RiskAnalytics {
   RiskAnalytics(
-      this.riskAttributes, this.riskStatus, this.riskFlagString, this.geoData);
+      this.riskStatus, this.riskFlagString, this.geoData);
 
-  final RiskAttributes riskAttributes;
   final String? riskStatus;
   final String? riskFlagString;
   final GeoData? geoData;
 
   static RiskAnalytics fromJson(dynamic json) {
     var geoDataJson = json['geoData'];
-
     GeoData? geoData;
 
     if (geoDataJson != null) {
@@ -97,55 +88,9 @@ class RiskAnalytics {
     }
 
     return RiskAnalytics(
-        RiskAttributes.fromJson(json['riskAttributes']),
         json['riskStatus'] as String?,
         json['riskFlagString'] as String?,
         geoData);
-  }
-}
-
-class RiskAttributes {
-  RiskAttributes(
-      this.distance,
-      this.isDifferentCountry,
-      this.isKnownAbuser,
-      this.isIcloudRelay,
-      this.isKnownAttacker,
-      this.isAnonymous,
-      this.isThreat,
-      this.isBogon,
-      this.blocklists,
-      this.isDatacenter,
-      this.isTor,
-      this.isProxy);
-
-  final int? distance;
-  final bool? isDifferentCountry;
-  final bool? isKnownAbuser;
-  final bool? isIcloudRelay;
-  final bool? isKnownAttacker;
-  final bool? isAnonymous;
-  final bool? isThreat;
-  final bool? isBogon;
-  final bool? blocklists;
-  final bool? isDatacenter;
-  final bool? isTor;
-  final bool? isProxy;
-
-  static RiskAttributes fromJson(dynamic json) {
-    return RiskAttributes(
-        json['distance'] as int?,
-        json['isDifferentCountry'] as bool?,
-        json['isKnownAbuser'] as bool?,
-        json['isIcloudRelay'] as bool?,
-        json['isKnownAttacker'] as bool?,
-        json['isAnonymous'] as bool?,
-        json['isThreat'] as bool?,
-        json['isBogon'] as bool?,
-        json['blocklists'] as bool?,
-        json['isDatacenter'] as bool?,
-        json['isTor'] as bool?,
-        json['isProxy'] as bool?);
   }
 }
 
