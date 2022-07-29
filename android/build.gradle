@@ -51,8 +51,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // Keyri
-    implementation 'com.github.Keyri-Co.keyri-android-whitelabel-sdk:keyrisdk:1.0.17'
-    implementation 'com.github.Keyri-Co.keyri-android-whitelabel-sdk:scanner:1.0.17'
+    implementation 'com.github.Keyri-Co.keyri-android-whitelabel-sdk:keyrisdk:1.0.18'
+    implementation 'com.github.Keyri-Co.keyri-android-whitelabel-sdk:scanner:1.0.18'
 
     // Gson
     implementation 'com.google.code.gson:gson:2.9.0'
