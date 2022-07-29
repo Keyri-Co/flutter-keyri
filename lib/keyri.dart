@@ -3,7 +3,9 @@ import 'package:keyri/session.dart';
 import 'keyri_platform_interface.dart';
 
 class Keyri {
-  Future<bool> easyKeyriAuth(
+
+  /// To Use this method, make sure your host Activity extended from FlutterFragmentActivity
+  Future<bool?> easyKeyriAuth(
       String appKey, String payload, String? publicUserId) {
     return KeyriPlatform.instance.easyKeyriAuth(appKey, payload, publicUserId);
   }
