@@ -73,6 +73,17 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
+  Future<bool> processLink(
+      String link, String appKey, String payload, String publicUserId) async {
+    return await methodChannel.invokeMethod<bool>('processLink', {
+      'link': link,
+      'appKey': appKey,
+      'payload': payload,
+      'publicUserId': publicUserId
+    }).then<bool>((bool? value) => value ?? false);
+  }
+
+  @override
   Future<bool> confirmSession(String sessionId, String payload) async {
     bool? value = await methodChannel.invokeMethod<bool>('confirmSession', {
       'sessionId': sessionId,

@@ -1,13 +1,13 @@
 package com.example.keyri
 
 import androidx.annotation.NonNull
-
+import android.net.Uri
 import android.app.Activity
 import android.content.Intent
 import com.google.gson.Gson
 import com.keyrico.keyrisdk.Keyri
+import com.keyrico.scanner.easyKeyriAuth
 import androidx.fragment.app.FragmentActivity
-import com.keyrico.keyrisdk.ui.auth.AuthWithScannerActivity
 import com.keyrico.keyrisdk.entity.session.Session
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -51,10 +51,10 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         when (call.method) {
             "easyKeyriAuth" -> {
                 val appKey = arguments?.get("appKey")
-                val publicUserId = arguments?.get("publicUserId")
                 val payload = arguments?.get("payload")
+                val publicUserId = arguments?.get("publicUserId")
 
-                easyKeyriAuth(appKey, publicUserId, payload, result)
+                easyKeyriAuth(appKey, payload, publicUserId, result)
             }
             "generateAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
@@ -85,6 +85,14 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val payload = arguments?.get("payload")
 
                 initializeDefaultScreen(sessionId, payload, result)
+            }
+            "processLink" -> {
+                val link = arguments?.get("link")
+                val appKey = arguments?.get("appKey")
+                val payload = arguments?.get("payload")
+                val publicUserId = arguments?.get("publicUserId")
+
+                processLink(link, appKey, payload, publicUserId, result)
             }
             "confirmSession" -> {
                 val sessionId = arguments?.get("sessionId")
@@ -131,21 +139,15 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     private fun easyKeyriAuth(
         appKey: String?,
-        publicUserId: String?,
         payload: String?,
+        publicUserId: String?,
         result: MethodChannel.Result
     ) {
         if (appKey == null || payload == null) {
             result.error("easyKeyriAuth", "appKey and payload must not be null", null)
         } else {
             activity?.let {
-                val intent = Intent(it, AuthWithScannerActivity::class.java).apply {
-                    putExtra(AuthWithScannerActivity.APP_KEY, appKey)
-                    putExtra(AuthWithScannerActivity.PUBLIC_USER_ID, publicUserId)
-                    putExtra(AuthWithScannerActivity.PAYLOAD, payload)
-                }
-
-                it.startActivityForResult(intent, AUTH_REQUEST_CODE)
+                easyKeyriAuth(it, AUTH_REQUEST_CODE, appKey, payload, publicUserId)
 
                 easyKeyriAuthResult = result
             } ?: result.error(
@@ -219,7 +221,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 result.error("initializeDefaultScreen", "payload must not be null", null)
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                    keyri.initializeDefaultScreen(fm, session, payload)
+                    keyri.initializeDefaultConfirmationScreen(fm, session, payload)
                         .onSuccess { isAuthenticated ->
                             result.success(isAuthenticated)
                         }.onFailure {
@@ -230,6 +232,35 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     "To Use this method, make sure your host Activity extended from FlutterFragmentActivity",
                     null
                 )
+            }
+        }
+    }
+
+    private fun processLink(
+        link: String?,
+        appKey: String?,
+        payload: String?,
+        publicUserId: String?,
+        result: MethodChannel.Result
+    ) {
+        mainScope.launch {
+            if (link == null) {
+                result.error("processLink", "link must not be null", null)
+            } else if (appKey == null) {
+                result.error("processLink", "appKey must not be null", null)
+            } else if (payload == null) {
+                result.error("processLink", "payload must not be null", null)
+            } else {
+                (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
+                    val uri = Uri.parse(link)
+
+                    keyri.easyKeyriAuth(fm, uri, appKey, payload, publicUserId)
+                        .onSuccess { isAuthenticated ->
+                            result.success(isAuthenticated)
+                        }.onFailure {
+                            result.error("processLink", it.message, null)
+                        }
+                }
             }
         }
     }

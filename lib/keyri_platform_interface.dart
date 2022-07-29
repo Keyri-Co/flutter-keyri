@@ -57,6 +57,11 @@ abstract class KeyriPlatform extends PlatformInterface {
         'initializeDefaultScreen() has not been implemented.');
   }
 
+  Future<bool> processLink(
+      String link, String appKey, String payload, String publicUserId) {
+    throw UnimplementedError('processLink() has not been implemented.');
+  }
+
   Future<bool> confirmSession(String sessionId, String payload) {
     throw UnimplementedError('confirmSession() has not been implemented.');
   }

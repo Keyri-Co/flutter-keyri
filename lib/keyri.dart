@@ -3,6 +3,7 @@ import 'package:keyri/session.dart';
 import 'keyri_platform_interface.dart';
 
 class Keyri {
+
   /// To Use this method, make sure your host Activity extended from FlutterFragmentActivity
   Future<bool?> easyKeyriAuth(
       String appKey, String payload, String? publicUserId) {
@@ -33,9 +34,12 @@ class Keyri {
         .initiateQrSession(appKey, sessionId, publicUserId);
   }
 
-  /// To Use this method, make sure your host Activity extended from FlutterFragmentActivity
   Future<bool> initializeDefaultScreen(String sessionId, String payload) {
     return KeyriPlatform.instance.initializeDefaultScreen(sessionId, payload);
+  }
+
+  Future<bool> processLink(String link, String appKey, String payload, String publicUserId) {
+    return KeyriPlatform.instance.processLink(link, appKey, payload, publicUserId);
   }
 
   Future<bool> confirmSession(String sessionId, String payload) {
