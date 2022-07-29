@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:keyri/keyri.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -44,8 +41,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             button(_easyKeyriAuth, 'Easy Keyri Auth'),
-            button(_customUI, 'Custom UI'),
-            button(_supabaseExample, 'Supabase')
+            button(_customUI, 'Custom UI')
           ],
         ),
       ),
@@ -60,47 +56,15 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   }
 
   void _customUI() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
-  }
-
-  void _supabaseExample() async {
-    var url = Uri.https('pidfgjqywchqcqdjhmsj.supabase.co', '/auth/v1/token',
-        {'grant_type': 'password'});
-
-    Map<String, String> headers = {
-      'apiKey':
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZGZnanF5d2NocWNxZGpobXNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTQ3NzQzNTUsImV4cCI6MTk3MDM1MDM1NX0.HY0mpzolDkg5TZ7_gim6i0mzXKbhCtIMJptgLcvdZv8',
-      'Content-Type': 'application/json'
-    };
-
-    final msg = jsonEncode(
-        {"email": "a.kuliahin@csn.khai.edu", "password": "4Science#"});
-
-    var response = await post(url, headers: headers, body: msg);
-
-    if (response.statusCode == 200) {
-      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
-      var refreshToken = Uri.parse(decodedResponse['refresh_token'] as String);
-
-      await keyri
-          .easyKeyriAuth("raB7SFWt27woKqkPhaUrmWAsCJIO8Moj",
-              '{"refreshToken":"$refreshToken"}', 'a.kuliahin@csn.khai.edu')
-          .then((authResult) => _onAuthResult(authResult ?? false))
-          .catchError((error, stackTrace) => _onError(error));
-    } else {
-      _onError(response.body);
-    }
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
   }
 
   void _onError(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _onAuthResult(bool result) {
     String text;
-    print(result);
     if (result) {
       text = 'Successfully authenticated!';
     } else {
@@ -168,8 +132,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [CircularProgressIndicator()]))
-                : MobileScanner(
-                    allowDuplicates: false, onDetect: onMobileScannerDetect),
+                : MobileScanner(allowDuplicates: false, onDetect: onMobileScannerDetect),
           )
         ],
       ),
@@ -187,8 +150,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   void _onError(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 
     setState(() {
       _isLoading = false;

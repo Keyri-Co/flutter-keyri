@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:keyri/session.dart';
 
 import 'keyri_platform_interface.dart';
-import 'dart:convert';
 
 /// An implementation of [KeyriPlatform] that uses method channels.
 class MethodChannelKeyri extends KeyriPlatform {
@@ -64,23 +63,11 @@ class MethodChannelKeyri extends KeyriPlatform {
 
   @override
   Future<bool> initializeDefaultScreen(String sessionId, String payload) async {
-    print("called");
     bool? value =  await methodChannel.invokeMethod<bool>('initializeDefaultScreen', {
       'sessionId': sessionId,
       'payload': payload
     });
     return value ?? false;
-  }
-
-  @override
-  Future<bool> processLink(
-      String link, String appKey, String payload, String publicUserId) async {
-    return await methodChannel.invokeMethod<bool>('processLink', {
-      'link': link,
-      'appKey': appKey,
-      'payload': payload,
-      'publicUserId': publicUserId
-    }).then<bool>((bool? value) => value ?? false);
   }
 
   @override
