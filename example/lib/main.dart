@@ -1,63 +1,213 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
+import 'dart:convert';
 
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:keyri/keyri.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+const String appKey = 'IT7VrTQ0r4InzsvCNJpRCRpi1qzfgpaj';
+
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  final _keyriPlugin = Keyri();
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _keyriPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        title: 'Keyri Example',
+        theme: ThemeData(primarySwatch: Colors.blue),
+        home: const KeyriHomePage(title: 'Keyri Example'));
+  }
+}
+
+class KeyriHomePage extends StatefulWidget {
+  const KeyriHomePage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  State<KeyriHomePage> createState() => _KeyriHomePageState();
+}
+
+class _KeyriHomePageState extends State<KeyriHomePage> {
+  Keyri keyri = Keyri();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.title)),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            button(_easyKeyriAuth, 'Easy Keyri Auth'),
+            button(_customUI, 'Custom UI'),
+            button(_supabaseExample, 'Supabase')
+          ],
         ),
       ),
     );
+  }
+
+  void _easyKeyriAuth() async {
+    await keyri
+        .easyKeyriAuth(appKey, 'Some payload', 'Public user ID')
+        .then((authResult) => _onAuthResult(authResult))
+        .catchError((error, stackTrace) => _onError(error));
+  }
+
+  void _customUI() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
+  }
+
+  void _supabaseExample() async {
+    var url = Uri.https('pidfgjqywchqcqdjhmsj.supabase.co', '/auth/v1/token',
+        {'grant_type': 'password'});
+
+    Map<String, String> headers = {
+      'apiKey':
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZGZnanF5d2NocWNxZGpobXNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTQ3NzQzNTUsImV4cCI6MTk3MDM1MDM1NX0.HY0mpzolDkg5TZ7_gim6i0mzXKbhCtIMJptgLcvdZv8',
+      'Content-Type': 'application/json'
+    };
+
+    final msg = jsonEncode(
+        {"email": "a.kuliahin@csn.khai.edu", "password": "4Science#"});
+
+    var response = await post(url, headers: headers, body: msg);
+
+    if (response.statusCode == 200) {
+      var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+      var refreshToken = Uri.parse(decodedResponse['refresh_token'] as String);
+
+      await keyri
+          .easyKeyriAuth("raB7SFWt27woKqkPhaUrmWAsCJIO8Moj",
+              '{"refreshToken":"$refreshToken"}', 'a.kuliahin@csn.khai.edu')
+          .then((authResult) => _onAuthResult(authResult))
+          .catchError((error, stackTrace) => _onError(error));
+    } else {
+      _onError(response.body);
+    }
+  }
+
+  void _onError(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _onAuthResult(bool result) {
+    String text;
+
+    if (result) {
+      text = 'Successfully authenticated!';
+    } else {
+      text = 'Authentication failed';
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  Widget button(VoidCallback onPressedCallback, String text) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        primary: Colors.deepPurple,
+        onPrimary: Colors.white,
+      ),
+      onPressed: onPressedCallback,
+      child: Text(text),
+    );
+  }
+}
+
+class KeyriScannerAuthPage extends StatefulWidget {
+  const KeyriScannerAuthPage({Key? key}) : super(key: key);
+
+  @override
+  State<KeyriScannerAuthPage> createState() => _KeyriScannerAuthPageState();
+}
+
+class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
+  bool _isLoading = false;
+
+  Keyri keyri = Keyri();
+
+  void onMobileScannerDetect(Barcode barcode, MobileScannerArguments? args) {
+    if (barcode.rawValue == null) {
+      debugPrint('Failed to scan Barcode');
+      return;
+    }
+
+    final String? code = barcode.rawValue;
+    debugPrint('Scanned barcode: $code');
+
+    if (code == null) return;
+
+    var sessionId = Uri.dataFromString(code).queryParameters['sessionId'];
+
+    if (sessionId == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+    _onReadSessionId(sessionId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: _isLoading
+                ? Center(
+                    child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [CircularProgressIndicator()]))
+                : MobileScanner(
+                    allowDuplicates: false, onDetect: onMobileScannerDetect),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onReadSessionId(String sessionId) async {
+    await keyri
+        .initiateQrSession(appKey, sessionId, 'Public user ID')
+        .then((session) => keyri
+            .initializeDefaultScreen(sessionId, 'Some payload')
+            .then((authResult) => _onAuthResult(authResult))
+            .catchError((error, stackTrace) => _onError(error.toString())))
+        .catchError((error, stackTrace) => _onError(error.toString()));
+  }
+
+  void _onError(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _onAuthResult(bool result) {
+    String text;
+
+    if (result) {
+      text = 'Successfully authenticated!';
+    } else {
+      text = 'Failed to authenticate';
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 }
