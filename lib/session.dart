@@ -19,14 +19,18 @@ class Session {
   final String? publicUserId;
 
   static Session fromJson(dynamic json) {
-    String jsonDataString = json.toString();
-    final jsonData = jsonDecode(jsonDataString);
+    dynamic jsonData;
+    try {
+          String jsonDataString = json.toString();
+          jsonData = jsonDecode(jsonDataString);
+    } catch(e){
+      jsonData = json;
+    }
 
     var widgetUserAgentJson = jsonData['widgetUserAgent'];
     widgetUserAgentJson ??= jsonData['WidgetUserAgent'];
 
     var riskAnalyticsJson = jsonData['riskAnalytics'];
-
     WidgetUserAgent? widgetUserAgent;
     RiskAnalytics? riskAnalytics;
 
