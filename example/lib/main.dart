@@ -86,7 +86,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
       await keyri
           .easyKeyriAuth("raB7SFWt27woKqkPhaUrmWAsCJIO8Moj",
               '{"refreshToken":"$refreshToken"}', 'a.kuliahin@csn.khai.edu')
-          .then((authResult) => _onAuthResult(authResult))
+          .then((authResult) => _onAuthResult(authResult ?? false))
           .catchError((error, stackTrace) => _onError(error));
     } else {
       _onError(response.body);

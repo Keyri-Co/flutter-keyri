@@ -19,8 +19,6 @@ class Session {
 
   static Session fromJson(dynamic json) {
     var widgetUserAgentJson = json['WidgetUserAgent'];
-    print(widgetUserAgentJson);
-    var userParametersJson = json['userParameters'];
     var riskAnalyticsJson = json['riskAnalytics'];
 
     WidgetUserAgent? widgetUserAgent;
@@ -35,14 +33,10 @@ class Session {
     }
 
     String? ipaddressMobile  = json['iPAddressMobile'] as String?;
-    if (ipaddressMobile == null) {
-      ipaddressMobile = json['IPAddressMobile'] as String?;
-    }
+    ipaddressMobile ??= json['IPAddressMobile'] as String?;
 
     String? ipaddressWidget = json['iPAddressWidget'] as String?;
-    if (ipaddressWidget == null) {
-      ipaddressMobile = json['IPAddressWidget'] as String?;
-    }
+    ipaddressWidget ??= json['IPAddressWidget'] as String?;
 
 
     return Session(
