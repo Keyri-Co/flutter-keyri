@@ -1,15 +1,5 @@
-# keyri
+## About
 
-A new Flutter plugin project.
+This is a package for Flutter mobile apps to support the [Keyri QR login system](https://keyri.com). Full documentation can be found here: https://docs.keyri.com/flutter.
 
-## Getting Started
-
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+The plugin is based on the Keyri iOS (Swift) and Android (Kotlin) packages, which require iOS 14+ and Android API level 23+ to work, respectively. Neither package has any third-party dependencies.
