@@ -254,7 +254,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     val uri = Uri.parse(link)
 
-                    keyri.easyKeyriAuth(fm, uri, appKey, payload, publicUserId)
+                    keyri.processLink(fm, uri, appKey, payload, publicUserId)
                         .onSuccess { isAuthenticated ->
                             result.success(isAuthenticated)
                         }.onFailure {

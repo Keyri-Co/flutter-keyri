@@ -19,18 +19,18 @@ class Session {
   final String? publicUserId;
 
   static Session fromJson(dynamic json) {
-    dynamic jsonData;
+    dynamic jsonData = json;
+
     try {
-          String jsonDataString = json.toString();
-          jsonData = jsonDecode(jsonDataString);
-    } catch(e){
+      String jsonDataString = json.toString();
+      jsonData = jsonDecode(jsonDataString);
+    } catch (e) {
       jsonData = json;
     }
 
-    var widgetUserAgentJson = jsonData['widgetUserAgent'];
-    widgetUserAgentJson ??= jsonData['WidgetUserAgent'];
-
+    var widgetUserAgentJson = jsonData['WidgetUserAgent'];
     var riskAnalyticsJson = jsonData['riskAnalytics'];
+
     WidgetUserAgent? widgetUserAgent;
     RiskAnalytics? riskAnalytics;
 
@@ -42,18 +42,12 @@ class Session {
       riskAnalytics = RiskAnalytics.fromJson(riskAnalyticsJson);
     }
 
-    String? ipaddressMobile = jsonData['iPAddressMobile'] as String?;
-    ipaddressMobile ??= jsonData['IPAddressMobile'] as String?;
-
-    String? ipaddressWidget = jsonData['iPAddressWidget'] as String?;
-    ipaddressWidget ??= jsonData['IPAddressWidget'] as String?;
-
     return Session(
-      jsonData['widgetOrigin'] as String?,
+      jsonData['WidgetOrigin'] as String?,
       jsonData['sessionId'] as String,
       widgetUserAgent,
-      ipaddressMobile ?? "",
-      ipaddressWidget ?? "",
+      jsonData['IPAddressMobile'] as String? ?? '',
+      jsonData['IPAddressWidget'] as String? ?? '',
       riskAnalytics,
       jsonData['publicUserId'] as String?,
     );
