@@ -30,7 +30,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                let username = args["publicUserId"],
                let sessionId = args["sessionId"],
                let appKey = args["appKey"] {
-                keyri.initializeQrSession(username: username, sessionId: sessionId, appKey: appKey) { returnedSession in
+                keyri.initiateQrSession(username: username, sessionId: sessionId, appKey: appKey) { returnedSession in
                     switch returnedSession {
                     case .failure(let error):
                         result(error.localizedDescription)
@@ -70,13 +70,10 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
             if let session = self.activeSession,
                let args = call.arguments as? [String: String],
                let payload = args["payload"] {
-                session.payload = payload
-                let vc = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.rootViewController
-                let cs = ConfirmationScreenUIView(session: session) { bool in
-                    vc?.dismiss(animated: true)
+                keyri.initializeDefaultConfirmationScreen(session: session, payload: payload) { bool in
                     result(bool)
                 }
-                vc!.present(cs.vc, animated: true)
+                
             } else {
                 result(false)
             }
