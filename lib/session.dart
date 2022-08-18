@@ -28,7 +28,7 @@ class Session {
       jsonData = json;
     }
 
-    var widgetUserAgentJson = jsonData['WidgetUserAgent'];
+    var widgetUserAgentJson = jsonData['widgetUserAgent'];
     var riskAnalyticsJson = jsonData['riskAnalytics'];
 
     WidgetUserAgent? widgetUserAgent;
@@ -43,11 +43,11 @@ class Session {
     }
 
     return Session(
-      jsonData['WidgetOrigin'] as String?,
+      jsonData['widgetOrigin'] as String?,
       jsonData['sessionId'] as String,
       widgetUserAgent,
-      jsonData['IPAddressMobile'] as String? ?? '',
-      jsonData['IPAddressWidget'] as String? ?? '',
+      jsonData['iPAddressMobile'] as String? ?? '',
+      jsonData['iPAddressWidget'] as String? ?? '',
       riskAnalytics,
       jsonData['publicUserId'] as String?,
     );

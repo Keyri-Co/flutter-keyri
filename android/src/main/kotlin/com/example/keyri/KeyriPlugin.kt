@@ -7,6 +7,7 @@ import android.content.Intent
 import com.google.gson.Gson
 import com.keyrico.keyrisdk.Keyri
 import com.keyrico.scanner.easyKeyriAuth
+import com.keyrico.keyrisdk.exception.DenialException
 import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.entity.session.Session
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -159,11 +160,11 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun generateAssociationKey(publicUserId: String?, result: MethodChannel.Result) {
-        if (publicUserId == null) {
-            result.error("generateAssociationKey", "publicUserId must not be null", null)
-        } else {
-            result.success(keyri.generateAssociationKey(publicUserId))
-        }
+        val associationKey = publicUserId?.let {
+            keyri.generateAssociationKey(publicUserId)
+        } ?: keyri.generateAssociationKey()
+
+        result.success(associationKey)
     }
 
     private fun getUserSignature(
@@ -172,9 +173,13 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         result: MethodChannel.Result
     ) {
         if (customSignedData == null) {
-            result.error("getUserSignature", "publicUserId must not be null", null)
+            result.error("getUserSignature", "customSignedData must not be null", null)
         } else {
-            result.success(keyri.getUserSignature(publicUserId, customSignedData))
+            val userSignature = publicUserId?.let {
+                keyri.generateUserSignature(it, customSignedData)
+            } ?: keyri.generateUserSignature(data = customSignedData)
+
+            result.success(userSignature)
         }
     }
 
@@ -183,7 +188,11 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun getAssociationKey(publicUserId: String?, result: MethodChannel.Result) {
-        result.success(keyri.getAssociationKey(publicUserId))
+        val associationKey = publicUserId?.let {
+            keyri.getAssociationKey(publicUserId)
+        } ?: keyri.getAssociationKey()
+
+        result.success(associationKey)
     }
 
     private fun initiateQrSession(
@@ -222,10 +231,14 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.initializeDefaultConfirmationScreen(fm, session, payload)
-                        .onSuccess { isAuthenticated ->
-                            result.success(isAuthenticated)
+                        .onSuccess { authResult ->
+                            result.success(authResult == "success")
                         }.onFailure {
-                            result.error("initializeDefaultScreen", it.message, null)
+                            if (it !is DenialException) {
+                                result.error("initializeDefaultScreen", it.message, null)
+                            } else {
+                                result.success(false)
+                            }
                         }
                 } ?: result.error(
                     "initializeDefaultScreen",
@@ -255,10 +268,14 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     val uri = Uri.parse(link)
 
                     keyri.processLink(fm, uri, appKey, payload, publicUserId)
-                        .onSuccess { isAuthenticated ->
-                            result.success(isAuthenticated)
+                        .onSuccess { authResult ->
+                            result.success(authResult == "success")
                         }.onFailure {
-                            result.error("processLink", it.message, null)
+                            if (it !is DenialException) {
+                                result.error("processLink", it.message, null)
+                            } else {
+                                result.success(false)
+                            }
                         }
                 }
             }

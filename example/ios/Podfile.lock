@@ -33,7 +33,7 @@ PODS:
   - keyri (0.0.1):
     - Flutter
     - keyri-pod
-  - keyri-pod (1.2.3)
+  - keyri-pod (1.5.1)
   - MLImage (1.0.0-beta2)
   - MLKitBarcodeScanning (1.7.0):
     - MLKitCommon (~> 5.0)
@@ -63,7 +63,7 @@ PODS:
   - nanopb/decode (2.30909.0)
   - nanopb/encode (2.30909.0)
   - PromisesObjC (2.1.1)
-  - Protobuf (3.21.4)
+  - Protobuf (3.21.5)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -104,7 +104,7 @@ SPEC CHECKSUMS:
   GoogleUtilitiesComponents: 679b2c881db3b615a2777504623df6122dd20afe
   GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   keyri: 11228fae015bef060de52317ab7a6dd2224d9d89
-  keyri-pod: 12cb64d3c339ac69206f7ac65fe668ca7c1c7cc3
+  keyri-pod: 7c9c64ae18aa93dd059a04ddae89129acfe8f570
   MLImage: a454f9f8ecfd537783a12f9488f5be1a68820829
   MLKitBarcodeScanning: b8257854f6afc1c8443d61ec6b98c28b35625df6
   MLKitCommon: 3bc17c6f7d25ce3660f030350b46ae7ec9ebca6e
@@ -112,7 +112,7 @@ SPEC CHECKSUMS:
   mobile_scanner: 073e39c0c96360297389f4db68e4297a1fa58349
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
-  Protobuf: 85a48c73d708782e2869564c0438e211aae98e7a
+  Protobuf: 7504b04fffcf6662ad629694db8231f5e744327f
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
