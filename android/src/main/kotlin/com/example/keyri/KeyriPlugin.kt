@@ -31,7 +31,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     private lateinit var channel: MethodChannel
 
-    private val keyri by lazy(::Keyri)
+    private lateinit var keyri: Keyri
 
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
@@ -119,6 +119,8 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
+        keyri = Keyri(binding.activity)
+
         binding.addActivityResultListener(this)
     }
 
