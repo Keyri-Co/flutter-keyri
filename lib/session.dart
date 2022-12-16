@@ -54,6 +54,11 @@ class Session {
       riskAnalytics = RiskAnalytics.fromJson(riskAnalyticsJson);
     }
 
+    if (mobileTemplateResponseJson != null) {
+      mobileTemplateResponse =
+          MobileTemplateResponse.fromJson(mobileTemplateResponseJson);
+    }
+
     return Session(
       jsonData['widgetOrigin'] as String?,
       jsonData['sessionId'] as String,
@@ -63,7 +68,7 @@ class Session {
       jsonData['iPAddressWidget'] as String? ?? '',
       riskAnalytics,
       jsonData['publicUserId'] as String?,
-      jmobileTemplateResponse,
+      mobileTemplateResponse,
     );
   }
 }
@@ -156,5 +161,81 @@ class IPData {
         json['latitude'] as double?,
         json['longitude'] as double?,
         json['regionCode'] as String?);
+  }
+}
+
+class MobileTemplateResponse {
+  MobileTemplateResponse(this.title, this.message, this.widget, this.mobile,
+      this.userAgent, this.flags);
+
+  final String? title;
+  final String? message;
+  final Template? widget;
+  final Template? mobile;
+  final UserAgent? userAgent;
+  final Flags? flags;
+
+  static MobileTemplateResponse fromJson(dynamic json) {
+    var widgetJson = json['widget'];
+    var mobileJson = json['mobile'];
+    var userAgentJson = json['userAgent'];
+    var flagsJson = json['flags'];
+
+    Template? widget;
+    Template? mobile;
+    UserAgent? userAgent;
+    Flags? flags;
+
+    if (widgetJson != null) {
+      widget = Template.fromJson(widgetJson);
+    }
+
+    if (mobileJson != null) {
+      mobile = Template.fromJson(mobileJson);
+    }
+
+    if (userAgentJson != null) {
+      userAgent = UserAgent.fromJson(userAgentJson);
+    }
+
+    if (flagsJson != null) {
+      flags = Flags.fromJson(flagsJson);
+    }
+
+    return MobileTemplateResponse(json['title'] as String?,
+        json['message'] as String?, widget, mobile, userAgent, flags);
+  }
+}
+
+class Template {
+  Template(this.location, this.issue);
+
+  final String? location;
+  final String? issue;
+
+  static Template fromJson(dynamic json) {
+    return Template(json['location'] as String?, json['issue'] as String?);
+  }
+}
+
+class UserAgent {
+  UserAgent(this.name, this.issue);
+
+  final String? name;
+  final String? issue;
+
+  static UserAgent fromJson(dynamic json) {
+    return UserAgent(json['name'] as String?, json['issue'] as String?);
+  }
+}
+
+class Flags {
+  Flags(this.isDatacenter, this.isNewBrowser);
+
+  final bool? isDatacenter;
+  final bool? isNewBrowser;
+
+  static Flags fromJson(dynamic json) {
+    return Flags(json['isDatacenter'] as bool?, json['isNewBrowser'] as bool?);
   }
 }
