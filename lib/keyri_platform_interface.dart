@@ -39,8 +39,12 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('getUserSignature() has not been implemented.');
   }
 
-  Future<List<String>> listAssociationKey() {
+  Future<Map<String, String>> listAssociationKey() {
     throw UnimplementedError('listAssociationKey() has not been implemented.');
+  }
+
+  Future<Map<String, String>> listUniqueAccounts() {
+    throw UnimplementedError('listUniqueAccounts() has not been implemented.');
   }
 
   Future<String?> getAssociationKey(String publicUserId) {

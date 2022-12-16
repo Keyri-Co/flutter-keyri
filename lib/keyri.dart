@@ -20,8 +20,12 @@ class Keyri {
         .getUserSignature(publicUserId, customSignedData);
   }
 
-  Future<List<String>> listAssociationKey() {
+  Future<Map<String, String>> listAssociationKey() {
     return KeyriPlatform.instance.listAssociationKey();
+  }
+
+  Future<Map<String, String>> listUniqueAccounts() {
+    return KeyriPlatform.instance.listUniqueAccounts();
   }
 
   Future<String?> getAssociationKey(String publicUserId) {

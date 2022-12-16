@@ -13,11 +13,8 @@ class MethodChannelKeyri extends KeyriPlatform {
   @override
   Future<bool?> easyKeyriAuth(
       String appKey, String payload, String? publicUserId) async {
-    bool? value = await methodChannel.invokeMethod<bool>('easyKeyriAuth', {
-      'appKey': appKey,
-      'payload': payload,
-      'publicUserId': publicUserId
-    });
+    bool? value = await methodChannel.invokeMethod<bool>('easyKeyriAuth',
+        {'appKey': appKey, 'payload': payload, 'publicUserId': publicUserId});
     return value ?? false;
   }
 
@@ -35,10 +32,17 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<List<String>> listAssociationKey() async {
+  Future<Map<String, String>> listAssociationKey() async {
     return await methodChannel
-        .invokeMethod<List<String>?>('listAssociationKey')
-        .then<List<String>>((List<String>? value) => value ?? []);
+        .invokeMethod<Map<String, String>?>('listAssociationKey')
+        .then<Map<String, String>>((Map<String, String>? value) => value ?? {});
+  }
+
+  @override
+  Future<Map<String, String>> listUniqueAccounts() async {
+    return await methodChannel
+        .invokeMethod<Map<String, String>?>('listUniqueAccounts')
+        .then<Map<String, String>>((Map<String, String>? value) => value ?? {});
   }
 
   @override
@@ -63,29 +67,24 @@ class MethodChannelKeyri extends KeyriPlatform {
 
   @override
   Future<bool> initializeDefaultScreen(String sessionId, String payload) async {
-    bool? value =  await methodChannel.invokeMethod<bool>('initializeDefaultScreen', {
-      'sessionId': sessionId,
-      'payload': payload
-    });
+    bool? value = await methodChannel.invokeMethod<bool>(
+        'initializeDefaultScreen',
+        {'sessionId': sessionId, 'payload': payload});
     return value ?? false;
   }
 
   @override
   Future<bool> confirmSession(String sessionId, String payload) async {
-    bool? value = await methodChannel.invokeMethod<bool>('confirmSession', {
-      'sessionId': sessionId,
-      'payload': payload
-    });
+    bool? value = await methodChannel.invokeMethod<bool>(
+        'confirmSession', {'sessionId': sessionId, 'payload': payload});
 
     return value ?? false;
   }
 
   @override
   Future<bool> denySession(String sessionId, String payload) async {
-    bool? value = await methodChannel.invokeMethod<bool>('denySession', {
-      'sessionId': sessionId,
-      'payload': payload
-    });
+    bool? value = await methodChannel.invokeMethod<bool>(
+        'denySession', {'sessionId': sessionId, 'payload': payload});
 
     return value ?? false;
   }

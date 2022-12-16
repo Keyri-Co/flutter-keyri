@@ -69,6 +69,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 getUserSignature(publicUserId, customSignedData, result)
             }
             "listAssociationKey" -> listAssociationKey(result)
+            "listUniqueAccounts" -> listUniqueAccounts(result)
             "getAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
 
@@ -187,6 +188,10 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     private fun listAssociationKey(result: MethodChannel.Result) {
         result.success(keyri.listAssociationKey())
+    }
+
+    private fun listUniqueAccounts(result: MethodChannel.Result) {
+        result.success(keyri.listUniqueAccounts())
     }
 
     private fun getAssociationKey(publicUserId: String?, result: MethodChannel.Result) {

@@ -5,18 +5,22 @@ class Session {
       this.widgetOrigin,
       this.sessionId,
       this.widgetUserAgent,
+      this.userParameters,
       this.iPAddressMobile,
       this.iPAddressWidget,
       this.riskAnalytics,
-      this.publicUserId);
+      this.publicUserId,
+      this.mobileTemplateResponse);
 
   final String? widgetOrigin;
   final String sessionId;
   final WidgetUserAgent? widgetUserAgent;
+  final UserParameters? userParameters;
   final String iPAddressMobile;
   final String iPAddressWidget;
   final RiskAnalytics? riskAnalytics;
   final String? publicUserId;
+  final MobileTemplateResponse? mobileTemplateResponse;
 
   static Session fromJson(dynamic json) {
     dynamic jsonData = json;
@@ -29,13 +33,21 @@ class Session {
     }
 
     var widgetUserAgentJson = jsonData['widgetUserAgent'];
+    var userParametersJson = jsonData['userParameters'];
     var riskAnalyticsJson = jsonData['riskAnalytics'];
+    var mobileTemplateResponseJson = jsonData['mobileTemplateResponse'];
 
     WidgetUserAgent? widgetUserAgent;
+    UserParameters? userParameters;
     RiskAnalytics? riskAnalytics;
+    MobileTemplateResponse? mobileTemplateResponse;
 
     if (widgetUserAgentJson != null) {
       widgetUserAgent = WidgetUserAgent.fromJson(widgetUserAgentJson);
+    }
+
+    if (userParametersJson != null) {
+      userParameters = UserParameters.fromJson(userParametersJson);
     }
 
     if (riskAnalyticsJson != null) {
@@ -46,10 +58,12 @@ class Session {
       jsonData['widgetOrigin'] as String?,
       jsonData['sessionId'] as String,
       widgetUserAgent,
+      userParameters,
       jsonData['iPAddressMobile'] as String? ?? '',
       jsonData['iPAddressWidget'] as String? ?? '',
       riskAnalytics,
       jsonData['publicUserId'] as String?,
+      jmobileTemplateResponse,
     );
   }
 }
@@ -65,6 +79,16 @@ class WidgetUserAgent {
       json['os'] as String,
       json['browser'] as String,
     );
+  }
+}
+
+class UserParameters {
+  UserParameters(this.base64EncodedData);
+
+  final String? base64EncodedData;
+
+  static UserParameters fromJson(dynamic json) {
+    return UserParameters(json['base64EncodedData'] as String?);
   }
 }
 
