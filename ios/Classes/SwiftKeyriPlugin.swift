@@ -20,7 +20,12 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                let payload = args["payload"],
                let appKey = args["appKey"] {
                 keyri.easyKeyriAuth(publicUserId: username, appKey: appKey, payload: payload) { didSucceed in
-                    result(didSucceed)
+                    switch didSucceed {
+                    case.failure:
+                        result(false)
+                    case .success(let bool):
+                        result(bool)
+                    }
                 }
             }
         }

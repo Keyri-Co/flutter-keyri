@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:keyri/keyri.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:supabase/supabase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+
+Future<void> main() async {
+  await Supabase.initialize(
+    url: 'https://pidfgjqywchqcqdjhmsj.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZGZnanF5d2NocWNxZGpobXNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTQ3NzQzNTUsImV4cCI6MTk3MDM1MDM1NX0.HY0mpzolDkg5TZ7_gim6i0mzXKbhCtIMJptgLcvdZv8',
+  );
   runApp(const MyApp());
 }
 
-const String appKey = 'IT7VrTQ0r4InzsvCNJpRCRpi1qzfgpaj';
+const String appKey = 'raB7SFWt27woKqkPhaUrmWAsCJIO8Moj'; // from Keyri Dev Portal
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -41,7 +49,6 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             button(_easyKeyriAuth, 'Easy Keyri Auth'),
-            button(_customUI, 'Custom UI')
           ],
         ),
       ),
@@ -49,14 +56,16 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   }
 
   void _easyKeyriAuth() async {
+    final supabase = Supabase.instance.client;
+    final res = await supabase.auth.signIn(email:"newUser123@gmail.com", password: "123test456");
+    final token = res.data!.refreshToken;
+    final payload = "{${'"'}refreshToken${'"'}: ${'"'}${token}${'"'}}";
+    // {"refreshToken": "[token]"}
+
     await keyri
-        .easyKeyriAuth(appKey, 'Some payload', 'Public user ID')
+        .easyKeyriAuth(appKey, payload, 'newUser123@gmail.com')
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
         .catchError((error, stackTrace) => _onError(error));
-  }
-
-  void _customUI() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
   }
 
   void _onError(String message) {
