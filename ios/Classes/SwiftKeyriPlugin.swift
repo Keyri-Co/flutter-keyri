@@ -87,14 +87,25 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
         if call.method == "getAssociationKey" {
             if let args = call.arguments as? [String: String],
                let user = args["publicUserId"] {
-                result(try? keyri.getAssociationKey(username:user)?.derRepresentation.base64EncodedString)
+                do {
+                    let key = try keyri.getAssociationKey(username:user)?.derRepresentation.base64EncodedString
+                    result(key ?? "NULL")
+                } catch {
+                    result(error.localizedDescription)
+                }
+                
             }
         }
         
         if call.method == "generateAssociationKey" {
             if let args = call.arguments as? [String: String],
                let user = args["publicUserId"] {
-                result(try? keyri.getAssociationKey(username:user)?.derRepresentation.base64EncodedString)
+                do {
+                    let key = try keyri.generateAssociationKey(username:user).derRepresentation.base64EncodedString
+                    result(key)
+                } catch {
+                    result(error.localizedDescription)
+                }
             }
         }
 
