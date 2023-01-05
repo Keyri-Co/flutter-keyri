@@ -298,7 +298,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else if (payload == null) {
                 result.error("confirmSession", "payload must not be null", null)
             } else {
-                session.confirm(payload).onSuccess { confirmationResult ->
+                session.confirm(payload, requireNotNull(activity)).onSuccess { confirmationResult ->
                     result.success(confirmationResult)
                 }.onFailure {
                     result.error("confirmSession", it.message, null)
@@ -316,7 +316,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else if (payload == null) {
                 result.error("denySession", "payload must not be null", null)
             } else {
-                session.deny(payload).onSuccess { denialResult ->
+                session.deny(payload, requireNotNull(activity)).onSuccess { denialResult ->
                     result.success(denialResult)
                 }.onFailure {
                     result.error("denySession", it.message, null)

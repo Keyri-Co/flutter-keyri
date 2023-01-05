@@ -2,7 +2,7 @@ group 'com.example.keyri'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '1.7.20'
     repositories {
         google()
         mavenCentral()
@@ -49,8 +49,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // Keyri
-    implementation 'com.keyri:keyrisdk:2.4.0'
-    implementation 'com.keyri:scanner:2.4.0'
+    implementation 'com.keyri:keyrisdk:2.5.3'
+    implementation 'com.keyri:scanner:2.5.3'
 
     // Gson
     implementation 'com.google.code.gson:gson:2.9.0'
