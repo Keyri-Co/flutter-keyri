@@ -1,6 +1,7 @@
 import 'package:keyri/session.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'keyri_fingerprint_event.dart';
 import 'keyri_method_channel.dart';
 
 abstract class KeyriPlatform extends PlatformInterface {
@@ -24,8 +25,12 @@ abstract class KeyriPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<bool?> easyKeyriAuth(
-      String appKey, String payload, String? publicUserId) {
+  Future<bool?> initialize(String appKey, String? publicApiKey) {
+    throw UnimplementedError('initialize() has not been implemented.');
+  }
+
+  Future<bool?> easyKeyriAuth(String appKey, String? publicApiKey,
+      String payload, String? publicUserId) {
     throw UnimplementedError('easyKeyriAuth() has not been implemented.');
   }
 
@@ -49,6 +54,16 @@ abstract class KeyriPlatform extends PlatformInterface {
 
   Future<String?> getAssociationKey(String publicUserId) {
     throw UnimplementedError('listAssociationKey() has not been implemented.');
+  }
+
+  Future<bool> removeAssociationKey(String publicUserId) {
+    throw UnimplementedError(
+        'removeAssociationKey() has not been implemented.');
+  }
+
+  Future<BaseFingerprintEventResponse?> sendEvent(String publicUserId,
+      EventType eventType, FingerprintLogResult eventResult) {
+    throw UnimplementedError('sendEvent() has not been implemented.');
   }
 
   Future<Session?> initiateQrSession(

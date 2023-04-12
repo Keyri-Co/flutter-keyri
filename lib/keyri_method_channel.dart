@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:keyri/session.dart';
 
+import 'keyri_fingerprint_event.dart';
 import 'keyri_platform_interface.dart';
 
 /// An implementation of [KeyriPlatform] that uses method channels.
@@ -11,11 +12,22 @@ class MethodChannelKeyri extends KeyriPlatform {
   final methodChannel = const MethodChannel('keyri');
 
   @override
-  Future<bool?> easyKeyriAuth(
-      String appKey, String payload, String? publicUserId) async {
-    bool? value = await methodChannel.invokeMethod<bool>('easyKeyriAuth',
-        {'appKey': appKey, 'payload': payload, 'publicUserId': publicUserId});
-    return value ?? false;
+  Future<bool?> initialize(String appKey, String? publicApiKey) async {
+    return await methodChannel.invokeMethod<bool>('easyKeyriAuth',
+            {'appKey': appKey, 'publicApiKey': publicApiKey}) ??
+        false;
+  }
+
+  @override
+  Future<bool?> easyKeyriAuth(String appKey, String? publicApiKey,
+      String payload, String? publicUserId) async {
+    return await methodChannel.invokeMethod<bool>('easyKeyriAuth', {
+          'appKey': appKey,
+          'publicApiKey': publicApiKey,
+          'payload': payload,
+          'publicUserId': publicUserId
+        }) ??
+        false;
   }
 
   @override
@@ -52,7 +64,25 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<Session?> initiateQrSession(
+  Future<bool> removeAssociationKey(String publicUserId) async {
+    return await methodChannel.invokeMethod<bool>(
+            'removeAssociationKey', {'publicUserId': publicUserId}) ??
+        false;
+  }
+
+  @override
+  Future<BaseFingerprintEventResponse?> sendEvent(String publicUserId,
+      EventType eventType, FingerprintLogResult eventResult) async {
+    return await methodChannel
+        .invokeMethod<BaseFingerprintEventResponse?>('sendEvent', {
+      'publicUserId': publicUserId,
+      'eventType': eventType.name,
+      'eventResult': eventResult.name
+    });
+  }
+
+  @override
+  Future<Session> initiateQrSession(
       String appKey, String sessionId, String? publicUserId) async {
     dynamic sessionObject = await methodChannel.invokeMethod<dynamic>(
         'initiateQrSession', {
@@ -61,31 +91,27 @@ class MethodChannelKeyri extends KeyriPlatform {
       'publicUserId': publicUserId
     });
 
-    Session session = Session.fromJson(sessionObject);
-    return session;
+    return Session.fromJson(sessionObject);
   }
 
   @override
   Future<bool> initializeDefaultScreen(String sessionId, String payload) async {
-    bool? value = await methodChannel.invokeMethod<bool>(
-        'initializeDefaultScreen',
-        {'sessionId': sessionId, 'payload': payload});
-    return value ?? false;
+    return await methodChannel.invokeMethod<bool>('initializeDefaultScreen',
+            {'sessionId': sessionId, 'payload': payload}) ??
+        false;
   }
 
   @override
   Future<bool> confirmSession(String sessionId, String payload) async {
-    bool? value = await methodChannel.invokeMethod<bool>(
-        'confirmSession', {'sessionId': sessionId, 'payload': payload});
-
-    return value ?? false;
+    return await methodChannel.invokeMethod<bool>(
+            'confirmSession', {'sessionId': sessionId, 'payload': payload}) ??
+        false;
   }
 
   @override
   Future<bool> denySession(String sessionId, String payload) async {
-    bool? value = await methodChannel.invokeMethod<bool>(
-        'denySession', {'sessionId': sessionId, 'payload': payload});
-
-    return value ?? false;
+    return await methodChannel.invokeMethod<bool>(
+            'denySession', {'sessionId': sessionId, 'payload': payload}) ??
+        false;
   }
 }

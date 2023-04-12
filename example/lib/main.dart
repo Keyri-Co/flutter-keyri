@@ -6,7 +6,8 @@ void main() {
   runApp(const MyApp());
 }
 
-const String appKey = 'IT7VrTQ0r4InzsvCNJpRCRpi1qzfgpaj';
+const String appKey = "[Your app key here]"; // Change it before launch
+const String? publicApiKey = null; // Change it before launch, optional
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -34,6 +35,8 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    keyri.initialize(appKey, publicApiKey);
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
@@ -48,19 +51,21 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
     );
   }
 
-  void _easyKeyriAuth() async {
-    await keyri
-        .easyKeyriAuth(appKey, 'Some payload', 'Public user ID')
+  void _easyKeyriAuth() {
+    keyri
+        .easyKeyriAuth(appKey, publicApiKey, 'Some payload', 'Public user ID')
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
         .catchError((error, stackTrace) => _onError(error));
   }
 
   void _customUI() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
   }
 
   void _onError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _onAuthResult(bool result) {
@@ -132,7 +137,8 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [CircularProgressIndicator()]))
-                : MobileScanner(allowDuplicates: false, onDetect: onMobileScannerDetect),
+                : MobileScanner(
+                    allowDuplicates: false, onDetect: onMobileScannerDetect),
           )
         ],
       ),
@@ -150,7 +156,8 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   void _onError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
 
     setState(() {
       _isLoading = false;

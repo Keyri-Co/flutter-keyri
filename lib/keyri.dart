@@ -1,13 +1,17 @@
 import 'package:keyri/session.dart';
 
+import 'keyri_fingerprint_event.dart';
 import 'keyri_platform_interface.dart';
 
 class Keyri {
+  Future<bool?> initialize(String appKey, String? publicApiKey) {
+    return KeyriPlatform.instance.initialize(appKey, publicApiKey);
+  }
 
-  /// To Use this method, make sure your host Activity extended from FlutterFragmentActivity
-  Future<bool?> easyKeyriAuth(
-      String appKey, String payload, String? publicUserId) {
-    return KeyriPlatform.instance.easyKeyriAuth(appKey, payload, publicUserId);
+  Future<bool?> easyKeyriAuth(String appKey, String? publicApiKey,
+      String payload, String? publicUserId) {
+    return KeyriPlatform.instance
+        .easyKeyriAuth(appKey, publicApiKey, payload, publicUserId);
   }
 
   Future<String?> generateAssociationKey(String publicUserId) {
@@ -32,6 +36,16 @@ class Keyri {
     return KeyriPlatform.instance.getAssociationKey(publicUserId);
   }
 
+  Future<bool> removeAssociationKey(String publicUserId) {
+    return KeyriPlatform.instance.removeAssociationKey(publicUserId);
+  }
+
+  Future<BaseFingerprintEventResponse?> sendEvent(String publicUserId,
+      EventType eventType, FingerprintLogResult eventResult) {
+    return KeyriPlatform.instance
+        .sendEvent(publicUserId, eventType, eventResult);
+  }
+
   Future<Session?> initiateQrSession(
       String appKey, String sessionId, String? publicUserId) {
     return KeyriPlatform.instance
@@ -42,8 +56,10 @@ class Keyri {
     return KeyriPlatform.instance.initializeDefaultScreen(sessionId, payload);
   }
 
-  Future<bool> processLink(String link, String appKey, String payload, String publicUserId) {
-    return KeyriPlatform.instance.processLink(link, appKey, payload, publicUserId);
+  Future<bool> processLink(
+      String link, String appKey, String payload, String publicUserId) {
+    return KeyriPlatform.instance
+        .processLink(link, appKey, payload, publicUserId);
   }
 
   Future<bool> confirmSession(String sessionId, String payload) {

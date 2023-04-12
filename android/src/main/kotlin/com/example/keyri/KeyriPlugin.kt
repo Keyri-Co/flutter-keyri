@@ -33,7 +33,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     private lateinit var keyri: Keyri
 
-    private val mainScope = CoroutineScope(Dispatchers.Main)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private var easyKeyriAuthResult: MethodChannel.Result? = null
 
@@ -50,12 +50,19 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         val arguments = call.arguments() as? Map<String, String?>?
 
         when (call.method) {
+            "initialize" -> {
+                val appKey = arguments?.get("appKey")
+                val publicApiKey = arguments?.get("publicApiKey")
+
+                initialize(appKey, publicApiKey, result)
+            }
             "easyKeyriAuth" -> {
                 val appKey = arguments?.get("appKey")
+                val publicApiKey = arguments?.get("publicApiKey")
                 val payload = arguments?.get("payload")
                 val publicUserId = arguments?.get("publicUserId")
 
-                easyKeyriAuth(appKey, payload, publicUserId, result)
+                easyKeyriAuth(appKey, publicApiKey, payload, publicUserId, result)
             }
             "generateAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
@@ -75,12 +82,23 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
                 getAssociationKey(publicUserId, result)
             }
+            "removeAssociationKey" -> {
+                val publicUserId = arguments?.get("publicUserId")
+
+                removeAssociationKey(publicUserId, result)
+            }
+            "sendEvent" -> {
+                val publicUserId = arguments?.get("publicUserId")
+                val eventType = arguments?.get("eventType")
+                val eventResult = arguments?.get("eventResult")
+
+                sendEvent(publicUserId, eventType, eventResult, result)
+            }
             "initiateQrSession" -> {
-                val appKey = arguments?.get("appKey")
                 val sessionId = arguments?.get("sessionId")
                 val publicUserId = arguments?.get("publicUserId")
 
-                initiateQrSession(appKey, sessionId, publicUserId, result)
+                initiateQrSession(sessionId, publicUserId, result)
             }
             "initializeDefaultScreen" -> {
                 val sessionId = arguments?.get("sessionId")
@@ -90,11 +108,10 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             }
             "processLink" -> {
                 val link = arguments?.get("link")
-                val appKey = arguments?.get("appKey")
                 val payload = arguments?.get("payload")
                 val publicUserId = arguments?.get("publicUserId")
 
-                processLink(link, appKey, payload, publicUserId, result)
+                processLink(link, payload, publicUserId, result)
             }
             "confirmSession" -> {
                 val sessionId = arguments?.get("sessionId")
@@ -120,7 +137,6 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
-        keyri = Keyri(binding.activity)
 
         binding.addActivityResultListener(this)
     }
@@ -141,8 +157,21 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         channel.setMethodCallHandler(null)
     }
 
+    private fun initialize(appKey: String?, publicApiKey: String?, result: MethodChannel.Result) {
+        if (appKey == null) {
+            result.error("initialize", "appKey must not be null", null)
+        } else {
+            activity?.let {
+                keyri = Keyri(it, appKey, publicApiKey)
+
+                result.success(true)
+            }
+        }
+    }
+
     private fun easyKeyriAuth(
         appKey: String?,
+        publicApiKey: String?,
         payload: String?,
         publicUserId: String?,
         result: MethodChannel.Result
@@ -151,7 +180,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             result.error("easyKeyriAuth", "appKey and payload must not be null", null)
         } else {
             activity?.let {
-                easyKeyriAuth(it, AUTH_REQUEST_CODE, appKey, payload, publicUserId)
+                easyKeyriAuth(it, AUTH_REQUEST_CODE, appKey, publicApiKey, payload, publicUserId)
 
                 easyKeyriAuthResult = result
             } ?: result.error(
@@ -163,11 +192,13 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun generateAssociationKey(publicUserId: String?, result: MethodChannel.Result) {
-        val associationKey = publicUserId?.let {
-            keyri.generateAssociationKey(publicUserId)
-        } ?: keyri.generateAssociationKey()
+        coroutineScope.launch {
+            val associationKey = publicUserId?.let {
+                keyri.generateAssociationKey(publicUserId)
+            } ?: keyri.generateAssociationKey()
 
-        result.success(associationKey)
+            result.success(associationKey)
+        }
     }
 
     private fun getUserSignature(
@@ -175,44 +206,88 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         customSignedData: String?,
         result: MethodChannel.Result
     ) {
-        if (customSignedData == null) {
-            result.error("getUserSignature", "customSignedData must not be null", null)
-        } else {
-            val userSignature = publicUserId?.let {
-                keyri.generateUserSignature(it, customSignedData)
-            } ?: keyri.generateUserSignature(data = customSignedData)
+        coroutineScope.launch {
+            if (customSignedData == null) {
+                result.error("getUserSignature", "customSignedData must not be null", null)
+            } else {
+                val userSignature = publicUserId?.let {
+                    keyri.generateUserSignature(it, customSignedData)
+                } ?: keyri.generateUserSignature(data = customSignedData)
 
-            result.success(userSignature)
+                result.success(userSignature)
+            }
         }
     }
 
     private fun listAssociationKey(result: MethodChannel.Result) {
-        result.success(keyri.listAssociationKey())
+        coroutineScope.launch {
+            result.success(keyri.listAssociationKey())
+        }
     }
 
     private fun listUniqueAccounts(result: MethodChannel.Result) {
-        result.success(keyri.listUniqueAccounts())
+        coroutineScope.launch {
+            result.success(keyri.listUniqueAccounts())
+        }
     }
 
     private fun getAssociationKey(publicUserId: String?, result: MethodChannel.Result) {
-        val associationKey = publicUserId?.let {
-            keyri.getAssociationKey(publicUserId)
-        } ?: keyri.getAssociationKey()
+        coroutineScope.launch {
+            val associationKey = publicUserId?.let {
+                keyri.getAssociationKey(publicUserId)
+            } ?: keyri.getAssociationKey()
 
-        result.success(associationKey)
+            result.success(associationKey)
+        }
+    }
+
+    private fun removeAssociationKey(publicUserId: String?, result: MethodChannel.Result) {
+        coroutineScope.launch {
+            if (publicUserId == null) {
+                result.error("removeAssociationKey", "publicUserId must not be null", null)
+            } else {
+                keyri.removeAssociationKey(publicUserId)
+                result.success(true)
+            }
+        }
+    }
+
+    private fun sendEvent(
+        publicUserId: String?,
+        eventType: String?,
+        eventResult: String?,
+        result: MethodChannel.Result
+    ) {
+        coroutineScope.launch {
+            if (eventType == null) {
+                result.error("sendEvent", "eventType must not be null", null)
+            } else if (eventResult == null) {
+                result.error("sendEvent", "eventResult must not be null", null)
+            } else {
+                val userId = if (publicUserId == null) "ANON" else publicUserId
+
+                val type = EventType.values().firstOrNull { it.type == eventType }
+                val eventRes = FingerprintLogResult.values().firstOrNull { it.type == eventResult }
+
+                keyri.sendEvent(publicUserId, type, eventRes).onSuccess { eventResult ->
+                    result.success(Gson().toJson(eventResult))
+                }.onFailure {
+                    result.error("sendEvent", it.message, null)
+                }
+            }
+        }
     }
 
     private fun initiateQrSession(
-        appKey: String?,
         sessionId: String?,
         publicUserId: String?,
         result: MethodChannel.Result
     ) {
-        mainScope.launch {
-            if (sessionId == null || appKey == null) {
-                result.error("initiateQrSession", "appKey and sessionId must not be null", null)
+        coroutineScope.launch {
+            if (sessionId == null) {
+                result.error("initiateQrSession", "sessionId must not be null", null)
             } else {
-                keyri.initiateQrSession(appKey, sessionId, publicUserId).onSuccess { session ->
+                keyri.initiateQrSession(sessionId, publicUserId).onSuccess { session ->
                     sessions.add(session)
 
                     result.success(Gson().toJson(session))
@@ -228,7 +303,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         payload: String?,
         result: MethodChannel.Result
     ) {
-        mainScope.launch {
+        coroutineScope.launch {
             val session = findSession(sessionId)
 
             if (session == null) {
@@ -258,23 +333,18 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     private fun processLink(
         link: String?,
-        appKey: String?,
         payload: String?,
         publicUserId: String?,
         result: MethodChannel.Result
     ) {
-        mainScope.launch {
+        coroutineScope.launch {
             if (link == null) {
                 result.error("processLink", "link must not be null", null)
-            } else if (appKey == null) {
-                result.error("processLink", "appKey must not be null", null)
             } else if (payload == null) {
                 result.error("processLink", "payload must not be null", null)
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                    val uri = Uri.parse(link)
-
-                    keyri.processLink(fm, uri, appKey, payload, publicUserId)
+                    keyri.processLink(fm, Uri.parse(link), payload, publicUserId)
                         .onSuccess { authResult ->
                             result.success(authResult == "success")
                         }.onFailure {
@@ -290,7 +360,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun confirmSession(sessionId: String?, payload: String?, result: MethodChannel.Result) {
-        mainScope.launch {
+        coroutineScope.launch {
             val session = findSession(sessionId)
 
             if (session == null) {
@@ -308,7 +378,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun denySession(sessionId: String?, payload: String?, result: MethodChannel.Result) {
-        mainScope.launch {
+        coroutineScope.launch {
             val session = findSession(sessionId)
 
             if (session == null) {
