@@ -25,7 +25,8 @@ abstract class KeyriPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<bool?> initialize(String appKey, String? publicApiKey) {
+  Future<bool?> initialize(
+      String appKey, String? publicApiKey, bool? blockEmulatorDetection) {
     throw UnimplementedError('initialize() has not been implemented.');
   }
 

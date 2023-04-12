@@ -12,9 +12,13 @@ class MethodChannelKeyri extends KeyriPlatform {
   final methodChannel = const MethodChannel('keyri');
 
   @override
-  Future<bool?> initialize(String appKey, String? publicApiKey) async {
-    return await methodChannel.invokeMethod<bool>('easyKeyriAuth',
-            {'appKey': appKey, 'publicApiKey': publicApiKey}) ??
+  Future<bool?> initialize(
+      String appKey, String? publicApiKey, bool? blockEmulatorDetection) async {
+    return await methodChannel.invokeMethod<bool>('initialize', {
+          'appKey': appKey,
+          'publicApiKey': publicApiKey,
+          'blockEmulatorDetection': blockEmulatorDetection.toString()
+        }) ??
         false;
   }
 

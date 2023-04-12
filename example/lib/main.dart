@@ -35,7 +35,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    keyri.initialize(appKey, publicApiKey);
+    keyri.initialize(appKey, publicApiKey, true);
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
@@ -146,7 +146,9 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   Future<void> _onReadSessionId(String sessionId) async {
-    await keyri
+    await keyri.initialize(appKey, publicApiKey, true);
+
+    keyri
         .initiateQrSession(appKey, sessionId, 'Public user ID')
         .then((session) => keyri
             .initializeDefaultScreen(sessionId, 'Some payload')

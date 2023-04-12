@@ -8,6 +8,8 @@ import com.google.gson.Gson
 import com.keyrico.keyrisdk.Keyri
 import com.keyrico.scanner.easyKeyriAuth
 import com.keyrico.keyrisdk.exception.DenialException
+import com.keyrico.keyrisdk.sec.fingerprint.enums.EventType
+import com.keyrico.keyrisdk.sec.fingerprint.enums.FingerprintLogResult
 import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.entity.session.Session
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -53,8 +55,9 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             "initialize" -> {
                 val appKey = arguments?.get("appKey")
                 val publicApiKey = arguments?.get("publicApiKey")
+                val blockEmulatorDetection = arguments?.get("blockEmulatorDetection") as? Boolean
 
-                initialize(appKey, publicApiKey, result)
+                initialize(appKey, publicApiKey, blockEmulatorDetection ?: true, result)
             }
             "easyKeyriAuth" -> {
                 val appKey = arguments?.get("appKey")
@@ -157,12 +160,17 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         channel.setMethodCallHandler(null)
     }
 
-    private fun initialize(appKey: String?, publicApiKey: String?, result: MethodChannel.Result) {
+    private fun initialize(
+        appKey: String?,
+        publicApiKey: String?,
+        blockEmulatorDetection: Boolean,
+        result: MethodChannel.Result
+    ) {
         if (appKey == null) {
             result.error("initialize", "appKey must not be null", null)
         } else {
             activity?.let {
-                keyri = Keyri(it, appKey, publicApiKey)
+                keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
 
                 result.success(true)
             }
@@ -259,17 +267,17 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         result: MethodChannel.Result
     ) {
         coroutineScope.launch {
-            if (eventType == null) {
+            val type = EventType.values().firstOrNull { it.type == eventType }
+            val eventRes = FingerprintLogResult.values().firstOrNull { it.type == eventResult }
+
+            if (type == null) {
                 result.error("sendEvent", "eventType must not be null", null)
-            } else if (eventResult == null) {
+            } else if (eventRes == null) {
                 result.error("sendEvent", "eventResult must not be null", null)
             } else {
                 val userId = if (publicUserId == null) "ANON" else publicUserId
 
-                val type = EventType.values().firstOrNull { it.type == eventType }
-                val eventRes = FingerprintLogResult.values().firstOrNull { it.type == eventResult }
-
-                keyri.sendEvent(publicUserId, type, eventRes).onSuccess { eventResult ->
+                keyri.sendEvent(userId, type, eventRes).onSuccess { eventResult ->
                     result.success(Gson().toJson(eventResult))
                 }.onFailure {
                     result.error("sendEvent", it.message, null)

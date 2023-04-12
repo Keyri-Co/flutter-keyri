@@ -4,8 +4,10 @@ import 'keyri_fingerprint_event.dart';
 import 'keyri_platform_interface.dart';
 
 class Keyri {
-  Future<bool?> initialize(String appKey, String? publicApiKey) {
-    return KeyriPlatform.instance.initialize(appKey, publicApiKey);
+  Future<bool?> initialize(
+      String appKey, String? publicApiKey, bool? blockEmulatorDetection) {
+    return KeyriPlatform.instance
+        .initialize(appKey, publicApiKey, blockEmulatorDetection);
   }
 
   Future<bool?> easyKeyriAuth(String appKey, String? publicApiKey,
