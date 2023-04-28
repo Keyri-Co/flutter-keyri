@@ -42,7 +42,7 @@ class Keyri {
     return KeyriPlatform.instance.removeAssociationKey(publicUserId);
   }
 
-  Future<BaseFingerprintEventResponse?> sendEvent(String publicUserId,
+  Future<bool> sendEvent(String publicUserId,
       EventType eventType, FingerprintLogResult eventResult) {
     return KeyriPlatform.instance
         .sendEvent(publicUserId, eventType, eventResult);

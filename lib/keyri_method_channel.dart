@@ -75,14 +75,14 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<BaseFingerprintEventResponse?> sendEvent(String publicUserId,
+  Future<bool> sendEvent(String publicUserId,
       EventType eventType, FingerprintLogResult eventResult) async {
     return await methodChannel
-        .invokeMethod<BaseFingerprintEventResponse?>('sendEvent', {
+        .invokeMethod<bool>('sendEvent', {
       'publicUserId': publicUserId,
       'eventType': eventType.name,
       'eventResult': eventResult.name
-    });
+    }) ?? false;
   }
 
   @override

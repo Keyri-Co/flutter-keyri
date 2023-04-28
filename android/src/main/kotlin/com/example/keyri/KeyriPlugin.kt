@@ -277,8 +277,8 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 val userId = if (publicUserId == null) "ANON" else publicUserId
 
-                keyri.sendEvent(userId, type, eventRes).onSuccess { eventResult ->
-                    result.success(Gson().toJson(eventResult))
+                keyri.sendEvent(userId, type, eventRes).onSuccess {
+                    result.success(true)
                 }.onFailure {
                     result.error("sendEvent", it.message, null)
                 }
