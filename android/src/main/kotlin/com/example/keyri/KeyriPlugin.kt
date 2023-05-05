@@ -59,6 +59,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
                 initialize(appKey, publicApiKey, blockEmulatorDetection ?: true, result)
             }
+
             "easyKeyriAuth" -> {
                 val appKey = arguments?.get("appKey")
                 val publicApiKey = arguments?.get("publicApiKey")
@@ -67,17 +68,20 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
                 easyKeyriAuth(appKey, publicApiKey, payload, publicUserId, result)
             }
+
             "generateAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
 
                 generateAssociationKey(publicUserId, result)
             }
+
             "getUserSignature" -> {
                 val publicUserId = arguments?.get("publicUserId")
                 val customSignedData = arguments?.get("customSignedData")
 
                 getUserSignature(publicUserId, customSignedData, result)
             }
+
             "listAssociationKey" -> listAssociationKey(result)
             "listUniqueAccounts" -> listUniqueAccounts(result)
             "getAssociationKey" -> {
@@ -85,11 +89,13 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
                 getAssociationKey(publicUserId, result)
             }
+
             "removeAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
 
                 removeAssociationKey(publicUserId, result)
             }
+
             "sendEvent" -> {
                 val publicUserId = arguments?.get("publicUserId")
                 val eventType = arguments?.get("eventType")
@@ -97,18 +103,21 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
                 sendEvent(publicUserId, eventType, eventResult, result)
             }
+
             "initiateQrSession" -> {
                 val sessionId = arguments?.get("sessionId")
                 val publicUserId = arguments?.get("publicUserId")
 
                 initiateQrSession(sessionId, publicUserId, result)
             }
+
             "initializeDefaultScreen" -> {
                 val sessionId = arguments?.get("sessionId")
                 val payload = arguments?.get("payload")
 
                 initializeDefaultScreen(sessionId, payload, result)
             }
+
             "processLink" -> {
                 val link = arguments?.get("link")
                 val payload = arguments?.get("payload")
@@ -116,18 +125,21 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
                 processLink(link, payload, publicUserId, result)
             }
+
             "confirmSession" -> {
                 val sessionId = arguments?.get("sessionId")
                 val payload = arguments?.get("payload")
 
                 confirmSession(sessionId, payload, result)
             }
+
             "denySession" -> {
                 val sessionId = arguments?.get("sessionId")
                 val payload = arguments?.get("payload")
 
                 denySession(sessionId, payload, result)
             }
+
             else -> result.notImplemented()
         }
     }
@@ -148,9 +160,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == AUTH_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                easyKeyriAuthResult?.success(resultCode == Activity.RESULT_OK)
-            }
+            easyKeyriAuthResult?.success(resultCode == Activity.RESULT_OK)
         }
 
         return false
@@ -170,7 +180,9 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             result.error("initialize", "appKey must not be null", null)
         } else {
             activity?.let {
-                keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
+                if (!this::keyri.isInitialized) {
+                    keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
+                }
 
                 result.success(true)
             }
