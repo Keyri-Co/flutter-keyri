@@ -5,15 +5,15 @@ import 'keyri_platform_interface.dart';
 
 class Keyri {
   Future<bool?> initialize(
-      String appKey, String? publicApiKey, bool? blockEmulatorDetection) {
+      String appKey, String? publicApiKey, String? serviceEncryptionKey, bool? blockEmulatorDetection) {
     return KeyriPlatform.instance
-        .initialize(appKey, publicApiKey, blockEmulatorDetection);
+        .initialize(appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection);
   }
 
-  Future<bool?> easyKeyriAuth(String appKey, String? publicApiKey,
+  Future<bool?> easyKeyriAuth(String appKey, String? publicApiKey, String? serviceEncryptionKey,
       String payload, String? publicUserId) {
     return KeyriPlatform.instance
-        .easyKeyriAuth(appKey, publicApiKey, payload, publicUserId);
+        .easyKeyriAuth(appKey, publicApiKey, serviceEncryptionKey, payload, publicUserId);
   }
 
   Future<String?> generateAssociationKey(String publicUserId) {
@@ -43,7 +43,7 @@ class Keyri {
   }
 
   Future<bool> sendEvent(String publicUserId,
-      EventType eventType, FingerprintLogResult eventResult) {
+      EventType eventType, bool success) {
     return KeyriPlatform.instance
         .sendEvent(publicUserId, eventType, eventResult);
   }

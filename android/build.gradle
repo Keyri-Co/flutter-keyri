@@ -49,8 +49,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // Keyri
-    implementation 'com.keyri:keyrisdk:3.0.5'
-    implementation 'com.keyri:scanner:3.0.0'
+    implementation 'com.keyri:keyrisdk:3.1.0'
+    implementation 'com.keyri:scanner:3.1.0'
 
     // Gson
     implementation 'com.google.code.gson:gson:2.9.0'
