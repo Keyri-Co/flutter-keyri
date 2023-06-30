@@ -8,6 +8,7 @@ void main() {
 
 const String appKey = "[Your app key here]"; // Change it before launch
 const String? publicApiKey = null; // Change it before launch, optional
+const String? serviceEncryptionKey = null; // Change it before launch, optional
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -35,7 +36,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    keyri.initialize(appKey, publicApiKey, true);
+    keyri.initialize(appKey, publicApiKey, serviceEncryptionKey, true);
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
@@ -53,7 +54,8 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   void _easyKeyriAuth() {
     keyri
-        .easyKeyriAuth(appKey, publicApiKey, 'Some payload', 'Public user ID')
+        .easyKeyriAuth(appKey, publicApiKey, serviceEncryptionKey,
+            'Some payload', 'Public user ID')
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
         .catchError((error, stackTrace) => _onError(error));
   }
@@ -146,7 +148,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   Future<void> _onReadSessionId(String sessionId) async {
-    await keyri.initialize(appKey, publicApiKey, true);
+    await keyri.initialize(appKey, publicApiKey, serviceEncryptionKey, true);
 
     keyri
         .initiateQrSession(appKey, sessionId, 'Public user ID')
@@ -166,16 +168,9 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
     });
   }
 
-  void _onAuthResult(bool result) {
-    String text;
-
-    if (result) {
-      text = 'Successfully authenticated!';
-    } else {
-      text = 'Failed to authenticate';
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  void _onAuthResult(void result) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Successfully authenticated!')));
 
     setState(() {
       _isLoading = false;

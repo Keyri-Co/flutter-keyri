@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:ffi';
-
 enum EventType {
   visits,
   login,
@@ -13,5 +10,3 @@ enum EventType {
   deposit,
   purchase;
 }
-
-enum FingerprintLogResult { success, fail, incomplete }

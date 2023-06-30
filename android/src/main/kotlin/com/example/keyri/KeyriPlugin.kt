@@ -288,8 +288,8 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 val userId = if (publicUserId == null) "ANON" else publicUserId
 
-                keyri.sendEvent(userId, type, success).onSuccess {
-                    result.success(true)
+                keyri.sendEvent(userId, type, success).onSuccess { eventResponse ->
+                    result.success(Gson().toJson(eventResponse))
                 }.onFailure {
                     result.error("sendEvent", it.message, null)
                 }
@@ -332,7 +332,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.initializeDefaultConfirmationScreen(fm, session, payload).getOrThrow()
-                    result.success(true)
+                    result.success(Unit)
                 } ?: result.error(
                     "initializeDefaultScreen",
                     "To Use this method, make sure your host Activity extended from FlutterFragmentActivity",
@@ -356,7 +356,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.processLink(fm, Uri.parse(link), payload, publicUserId)
-                    result.success(true)
+                    result.success(Unit)
                 }
             }
         }
@@ -371,8 +371,8 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else if (payload == null) {
                 result.error("confirmSession", "payload must not be null", null)
             } else {
-                session.confirm(payload, requireNotNull(activity)).onSuccess { confirmationResult ->
-                    result.success(confirmationResult)
+                session.confirm(payload, requireNotNull(activity)).onSuccess {
+                    result.success(Unit)
                 }.onFailure {
                     result.error("confirmSession", it.message, null)
                 }
@@ -389,8 +389,8 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else if (payload == null) {
                 result.error("denySession", "payload must not be null", null)
             } else {
-                session.deny(payload, requireNotNull(activity)).onSuccess { denialResult ->
-                    result.success(denialResult)
+                session.deny(payload, requireNotNull(activity)).onSuccess {
+                    result.success(Unit)
                 }.onFailure {
                     result.error("denySession", it.message, null)
                 }
