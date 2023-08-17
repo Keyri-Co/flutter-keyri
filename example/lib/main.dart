@@ -136,11 +136,11 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
           Expanded(
             flex: 1,
             child: _isLoading
-                ? Center(
+                ? const Center(
                     child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [CircularProgressIndicator()]))
+                        children: [CircularProgressIndicator()]))
                 : MobileScanner(
                     allowDuplicates: false, onDetect: onMobileScannerDetect),
           )
