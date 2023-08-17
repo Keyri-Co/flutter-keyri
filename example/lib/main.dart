@@ -6,7 +6,11 @@ void main() {
   runApp(const MyApp());
 }
 
-const String appKey = 'IT7VrTQ0r4InzsvCNJpRCRpi1qzfgpaj';
+const String appKey = "[Your app key here]"; // Change it before launch
+const String? publicApiKey = null; // Change it before launch, optional
+const String? serviceEncryptionKey = null; // Change it before launch, optional
+const bool blockEmulatorDetection = true;
+const String? publicUserId = null; // Change it before launch, optional
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -34,6 +38,8 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    keyri.initialize(appKey, publicApiKey, serviceEncryptionKey, true);
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
@@ -48,19 +54,22 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
     );
   }
 
-  void _easyKeyriAuth() async {
-    await keyri
-        .easyKeyriAuth(appKey, 'Some payload', 'Public user ID')
+  void _easyKeyriAuth() {
+    keyri
+        .easyKeyriAuth(appKey, publicApiKey, serviceEncryptionKey,
+            blockEmulatorDetection, 'Some payload', publicUserId)
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
         .catchError((error, stackTrace) => _onError(error));
   }
 
   void _customUI() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
   }
 
   void _onError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _onAuthResult(bool result) {
@@ -77,8 +86,8 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   Widget button(VoidCallback onPressedCallback, String text) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        primary: Colors.deepPurple,
-        onPrimary: Colors.white,
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.deepPurple,
       ),
       onPressed: onPressedCallback,
       child: Text(text),
@@ -127,12 +136,13 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
           Expanded(
             flex: 1,
             child: _isLoading
-                ? Center(
+                ? const Center(
                     child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [CircularProgressIndicator()]))
-                : MobileScanner(allowDuplicates: false, onDetect: onMobileScannerDetect),
+                        children: [CircularProgressIndicator()]))
+                : MobileScanner(
+                    allowDuplicates: false, onDetect: onMobileScannerDetect),
           )
         ],
       ),
@@ -140,17 +150,20 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   Future<void> _onReadSessionId(String sessionId) async {
-    await keyri
-        .initiateQrSession(appKey, sessionId, 'Public user ID')
+    await keyri.initialize(appKey, publicApiKey, serviceEncryptionKey, true);
+
+    keyri
+        .initiateQrSession(sessionId, publicUserId)
         .then((session) => keyri
-            .initializeDefaultScreen(sessionId, 'Some payload')
+            .initializeDefaultConfirmationScreen(sessionId, 'Some payload')
             .then((authResult) => _onAuthResult(authResult))
             .catchError((error, stackTrace) => _onError(error.toString())))
         .catchError((error, stackTrace) => _onError(error.toString()));
   }
 
   void _onError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
 
     setState(() {
       _isLoading = false;
@@ -158,15 +171,14 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   void _onAuthResult(bool result) {
-    String text;
+    var successfullyAuthenticatedText = 'Successfully authenticated!';
 
-    if (result) {
-      text = 'Successfully authenticated!';
-    } else {
-      text = 'Failed to authenticate';
+    if (!result) {
+      successfullyAuthenticatedText = 'Failed to authenticate';
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(successfullyAuthenticatedText)));
 
     setState(() {
       _isLoading = false;

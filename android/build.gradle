@@ -1,8 +1,8 @@
-group 'com.example.keyri'
+group 'com.keyrico.keyri'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '1.8.21'
     repositories {
         google()
         mavenCentral()
@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 31
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -46,12 +46,10 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
     // Keyri
-    implementation 'com.keyri:keyrisdk:1.2.0'
-    implementation 'com.keyri:scanner:1.2.0'
+    implementation 'com.keyri:keyrisdk:3.3.1'
+    implementation 'com.keyri:scanner:3.3.1'
 
     // Gson
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }

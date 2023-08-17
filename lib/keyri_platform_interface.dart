@@ -1,6 +1,8 @@
 import 'package:keyri/session.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'fingerprint_event_response.dart';
+import 'keyri_fingerprint_event.dart';
 import 'keyri_method_channel.dart';
 
 abstract class KeyriPlatform extends PlatformInterface {
@@ -24,8 +26,18 @@ abstract class KeyriPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  Future<bool?> initialize(String appKey, String? publicApiKey,
+      String? serviceEncryptionKey, bool? blockEmulatorDetection) {
+    throw UnimplementedError('initialize() has not been implemented.');
+  }
+
   Future<bool?> easyKeyriAuth(
-      String appKey, String payload, String? publicUserId) {
+      String appKey,
+      String? publicApiKey,
+      String? serviceEncryptionKey,
+      bool? blockEmulatorDetection,
+      String payload,
+      String? publicUserId) {
     throw UnimplementedError('easyKeyriAuth() has not been implemented.');
   }
 
@@ -34,35 +46,48 @@ abstract class KeyriPlatform extends PlatformInterface {
         'generateAssociationKey() has not been implemented.');
   }
 
-  Future<String?> getUserSignature(
-      String? publicUserId, String customSignedData) {
-    throw UnimplementedError('getUserSignature() has not been implemented.');
+  Future<String?> generateUserSignature(String? publicUserId, String data) {
+    throw UnimplementedError(
+        'generateUserSignature() has not been implemented.');
   }
 
-  Future<List<String>> listAssociationKey() {
-    throw UnimplementedError('listAssociationKey() has not been implemented.');
+  Future<Map<String, String>> listAssociationKeys() {
+    throw UnimplementedError('listAssociationKeys() has not been implemented.');
+  }
+
+  Future<Map<String, String>> listUniqueAccounts() {
+    throw UnimplementedError('listUniqueAccounts() has not been implemented.');
   }
 
   Future<String?> getAssociationKey(String publicUserId) {
-    throw UnimplementedError('listAssociationKey() has not been implemented.');
+    throw UnimplementedError('getAssociationKey() has not been implemented.');
   }
 
-  Future<Session?> initiateQrSession(
-      String appKey, String sessionId, String? publicUserId) {
+  Future<bool> removeAssociationKey(String publicUserId) {
+    throw UnimplementedError(
+        'removeAssociationKey() has not been implemented.');
+  }
+
+  Future<FingerprintEventResponse?> sendEvent(
+      String publicUserId, EventType eventType, bool success) {
+    throw UnimplementedError('sendEvent() has not been implemented.');
+  }
+
+  Future<Session?> initiateQrSession(String sessionId, String? publicUserId) {
     throw UnimplementedError('initiateQrSession() has not been implemented.');
   }
 
-  Future<bool> initializeDefaultScreen(String sessionId, String payload) {
+  Future<bool> initializeDefaultConfirmationScreen(String sessionId, String payload) {
     throw UnimplementedError(
-        'initializeDefaultScreen() has not been implemented.');
+        'initializeDefaultConfirmationScreen() has not been implemented.');
   }
 
-  Future<bool> processLink(
-      String link, String appKey, String payload, String publicUserId) {
+  Future<bool> processLink(String link, String payload, String publicUserId) {
     throw UnimplementedError('processLink() has not been implemented.');
   }
 
-  Future<bool> confirmSession(String sessionId, String payload) {
+  Future<bool> confirmSession(
+      String sessionId, String payload, bool trustNewBrowser) {
     throw UnimplementedError('confirmSession() has not been implemented.');
   }
 

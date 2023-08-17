@@ -1,49 +1,70 @@
+import 'package:keyri/fingerprint_event_response.dart';
 import 'package:keyri/session.dart';
 
+import 'keyri_fingerprint_event.dart';
 import 'keyri_platform_interface.dart';
 
 class Keyri {
+  Future<bool?> initialize(String appKey, String? publicApiKey,
+      String? serviceEncryptionKey, bool? blockEmulatorDetection) {
+    return KeyriPlatform.instance.initialize(
+        appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection);
+  }
 
-  /// To Use this method, make sure your host Activity extended from FlutterFragmentActivity
   Future<bool?> easyKeyriAuth(
-      String appKey, String payload, String? publicUserId) {
-    return KeyriPlatform.instance.easyKeyriAuth(appKey, payload, publicUserId);
+      String appKey,
+      String? publicApiKey,
+      String? serviceEncryptionKey,
+      bool? blockEmulatorDetection,
+      String payload,
+      String? publicUserId) {
+    return KeyriPlatform.instance.easyKeyriAuth(appKey, publicApiKey,
+        serviceEncryptionKey, blockEmulatorDetection, payload, publicUserId);
   }
 
   Future<String?> generateAssociationKey(String publicUserId) {
     return KeyriPlatform.instance.generateAssociationKey(publicUserId);
   }
 
-  Future<String?> getUserSignature(
-      String? publicUserId, String customSignedData) {
-    return KeyriPlatform.instance
-        .getUserSignature(publicUserId, customSignedData);
+  Future<String?> generateUserSignature(String? publicUserId, String data) {
+    return KeyriPlatform.instance.generateUserSignature(publicUserId, data);
   }
 
-  Future<List<String>> listAssociationKey() {
-    return KeyriPlatform.instance.listAssociationKey();
+  Future<Map<String, String>> listAssociationKeys() {
+    return KeyriPlatform.instance.listAssociationKeys();
+  }
+
+  Future<Map<String, String>> listUniqueAccounts() {
+    return KeyriPlatform.instance.listUniqueAccounts();
   }
 
   Future<String?> getAssociationKey(String publicUserId) {
     return KeyriPlatform.instance.getAssociationKey(publicUserId);
   }
 
-  Future<Session?> initiateQrSession(
-      String appKey, String sessionId, String? publicUserId) {
-    return KeyriPlatform.instance
-        .initiateQrSession(appKey, sessionId, publicUserId);
+  Future<bool> removeAssociationKey(String publicUserId) {
+    return KeyriPlatform.instance.removeAssociationKey(publicUserId);
   }
 
-  Future<bool> initializeDefaultScreen(String sessionId, String payload) {
-    return KeyriPlatform.instance.initializeDefaultScreen(sessionId, payload);
+  Future<FingerprintEventResponse?> sendEvent(
+      String publicUserId, EventType eventType, bool success) {
+    return KeyriPlatform.instance.sendEvent(publicUserId, eventType, success);
   }
 
-  Future<bool> processLink(String link, String appKey, String payload, String publicUserId) {
-    return KeyriPlatform.instance.processLink(link, appKey, payload, publicUserId);
+  Future<Session?> initiateQrSession(String sessionId, String? publicUserId) {
+    return KeyriPlatform.instance.initiateQrSession(sessionId, publicUserId);
   }
 
-  Future<bool> confirmSession(String sessionId, String payload) {
-    return KeyriPlatform.instance.confirmSession(sessionId, payload);
+  Future<bool> initializeDefaultConfirmationScreen(String sessionId, String payload) {
+    return KeyriPlatform.instance.initializeDefaultConfirmationScreen(sessionId, payload);
+  }
+
+  Future<bool> processLink(String link, String payload, String publicUserId) {
+    return KeyriPlatform.instance.processLink(link, payload, publicUserId);
+  }
+
+  Future<bool> confirmSession(String sessionId, String payload, bool trustNewBrowser) {
+    return KeyriPlatform.instance.confirmSession(sessionId, payload, trustNewBrowser);
   }
 
   Future<bool> denySession(String sessionId, String payload) {

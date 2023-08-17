@@ -6,7 +6,6 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
     var activeSession: Session?
     let keyri = Keyri()
 
-    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "keyri", binaryMessenger: registrar.messenger())
         let instance = SwiftKeyriPlugin()
@@ -48,7 +47,6 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
             } else {
                 result("failed to parse arguments")
             }
-
         }
         
         if call.method == "confirmSession" {
@@ -78,7 +76,6 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                 keyri.initializeDefaultConfirmationScreen(session: session, payload: payload) { bool in
                     result(bool)
                 }
-                
             } else {
                 result(false)
             }
@@ -108,8 +105,6 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                 }
             }
         }
-
-
     }
 }
 
