@@ -1,4 +1,4 @@
-package com.example.keyri
+package com.keyrico.keyri
 
 import androidx.annotation.NonNull
 import android.net.Uri
@@ -32,14 +32,12 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     PluginRegistry.ActivityResultListener {
 
     private lateinit var channel: MethodChannel
-
     private lateinit var keyri: Keyri
 
-    private var easyKeyriAuthResult: MethodChannel.Result? = null
-
-    private var activity: Activity? = null
-
     private val sessions = mutableListOf<Session>()
+
+    private var easyKeyriAuthResult: MethodChannel.Result? = null
+    private var activity: Activity? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL)
@@ -54,19 +52,36 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val appKey = arguments?.get("appKey")
                 val publicApiKey = arguments?.get("publicApiKey")
                 val serviceEncryptionKey = arguments?.get("serviceEncryptionKey")
-                val blockEmulatorDetection = arguments?.get("blockEmulatorDetection") as? Boolean
+                val blockEmulatorDetection =
+                    arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
 
-                initialize(appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection ?: true, result)
+                initialize(
+                    appKey,
+                    publicApiKey,
+                    serviceEncryptionKey,
+                    blockEmulatorDetection,
+                    result
+                )
             }
 
             "easyKeyriAuth" -> {
                 val appKey = arguments?.get("appKey")
                 val publicApiKey = arguments?.get("publicApiKey")
                 val serviceEncryptionKey = arguments?.get("serviceEncryptionKey")
+                val blockEmulatorDetection =
+                    arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
                 val payload = arguments?.get("payload")
                 val publicUserId = arguments?.get("publicUserId")
 
-                easyKeyriAuth(appKey, publicApiKey, serviceEncryptionKey, payload, publicUserId, result)
+                easyKeyriAuth(
+                    appKey,
+                    publicApiKey,
+                    serviceEncryptionKey,
+                    blockEmulatorDetection,
+                    payload,
+                    publicUserId,
+                    result
+                )
             }
 
             "generateAssociationKey" -> {
@@ -75,14 +90,14 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 generateAssociationKey(publicUserId, result)
             }
 
-            "getUserSignature" -> {
+            "generateUserSignature" -> {
                 val publicUserId = arguments?.get("publicUserId")
-                val customSignedData = arguments?.get("customSignedData")
+                val data = arguments?.get("data")
 
-                getUserSignature(publicUserId, customSignedData, result)
+                generateUserSignature(publicUserId, data, result)
             }
 
-            "listAssociationKey" -> listAssociationKey(result)
+            "listAssociationKeys" -> listAssociationKeys(result)
             "listUniqueAccounts" -> listUniqueAccounts(result)
             "getAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
@@ -99,7 +114,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             "sendEvent" -> {
                 val publicUserId = arguments?.get("publicUserId")
                 val eventType = arguments?.get("eventType")
-                val success = arguments?.get("success") as? Boolean
+                val success = arguments?.get("success")?.toBoolean() ?: true
 
                 sendEvent(publicUserId, eventType, success, result)
             }
@@ -111,7 +126,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 initiateQrSession(sessionId, publicUserId, result)
             }
 
-            "initializeDefaultScreen" -> {
+            "initializeDefaultConfirmationScreen" -> {
                 val sessionId = arguments?.get("sessionId")
                 val payload = arguments?.get("payload")
 
@@ -129,8 +144,9 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             "confirmSession" -> {
                 val sessionId = arguments?.get("sessionId")
                 val payload = arguments?.get("payload")
+                val trustNewBrowser = arguments?.get("trustNewBrowser")?.toBoolean() ?: false
 
-                confirmSession(sessionId, payload, result)
+                confirmSession(sessionId, payload, trustNewBrowser, result)
             }
 
             "denySession" -> {
@@ -182,7 +198,13 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         } else {
             activity?.let {
                 if (!this::keyri.isInitialized) {
-                    keyri = Keyri(it, appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection)
+                    keyri = Keyri(
+                        it,
+                        appKey,
+                        publicApiKey,
+                        serviceEncryptionKey,
+                        blockEmulatorDetection
+                    )
                 }
 
                 result.success(true)
@@ -194,6 +216,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         appKey: String?,
         publicApiKey: String?,
         serviceEncryptionKey: String?,
+        blockEmulatorDetection: Boolean,
         payload: String?,
         publicUserId: String?,
         result: MethodChannel.Result
@@ -202,11 +225,20 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             result.error("easyKeyriAuth", "appKey and payload must not be null", null)
         } else {
             activity?.let {
-                easyKeyriAuth(it, AUTH_REQUEST_CODE, appKey, publicApiKey, serviceEncryptionKey, payload, publicUserId)
+                easyKeyriAuth(
+                    it,
+                    AUTH_REQUEST_CODE,
+                    appKey,
+                    publicApiKey,
+                    serviceEncryptionKey,
+                    blockEmulatorDetection,
+                    payload,
+                    publicUserId
+                )
 
                 easyKeyriAuthResult = result
             } ?: result.error(
-                "initializeDefaultScreen",
+                "easyKeyriAuth",
                 "To Use this method, make sure your host Activity extended from FlutterFragmentActivity",
                 null
             )
@@ -223,17 +255,17 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun getUserSignature(
+    private fun generateUserSignature(
         publicUserId: String?,
-        customSignedData: String?,
+        data: String?,
         result: MethodChannel.Result
     ) {
-        keyriCoroutineScope("getUserSignature", result::error).launch {
-            if (customSignedData == null) {
-                result.error("getUserSignature", "customSignedData must not be null", null)
+        keyriCoroutineScope("generateUserSignature", result::error).launch {
+            if (data == null) {
+                result.error("generateUserSignature", "data must not be null", null)
             } else {
                 val userSignature = publicUserId?.let {
-                    keyri.generateUserSignature(it, customSignedData).getOrThrow()
+                    keyri.generateUserSignature(it, data).getOrThrow()
                 } ?: keyri.generateUserSignature(data = customSignedData).getOrThrow()
 
                 result.success(userSignature)
@@ -241,9 +273,9 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun listAssociationKey(result: MethodChannel.Result) {
-        keyriCoroutineScope("listAssociationKey", result::error).launch {
-            result.success(keyri.listAssociationKey().getOrThrow())
+    private fun listAssociationKeys(result: MethodChannel.Result) {
+        keyriCoroutineScope("listAssociationKeys", result::error).launch {
+            result.success(keyri.listAssociationKeys().getOrThrow())
         }
     }
 
@@ -332,7 +364,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.initializeDefaultConfirmationScreen(fm, session, payload).getOrThrow()
-                    result.success(Unit)
+                    result.success(true)
                 } ?: result.error(
                     "initializeDefaultScreen",
                     "To Use this method, make sure your host Activity extended from FlutterFragmentActivity",
@@ -356,7 +388,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.processLink(fm, Uri.parse(link), payload, publicUserId)
-                    result.success(Unit)
+                    result.success(true)
                 }
             }
         }
@@ -372,7 +404,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 result.error("confirmSession", "payload must not be null", null)
             } else {
                 session.confirm(payload, requireNotNull(activity)).onSuccess {
-                    result.success(Unit)
+                    result.success(true)
                 }.onFailure {
                     result.error("confirmSession", it.message, null)
                 }
@@ -390,7 +422,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 result.error("denySession", "payload must not be null", null)
             } else {
                 session.deny(payload, requireNotNull(activity)).onSuccess {
-                    result.success(Unit)
+                    result.success(true)
                 }.onFailure {
                     result.error("denySession", it.message, null)
                 }

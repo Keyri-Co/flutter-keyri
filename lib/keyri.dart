@@ -11,24 +11,27 @@ class Keyri {
         appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection);
   }
 
-  Future<bool?> easyKeyriAuth(String appKey, String? publicApiKey,
-      String? serviceEncryptionKey, String payload, String? publicUserId) {
-    return KeyriPlatform.instance.easyKeyriAuth(
-        appKey, publicApiKey, serviceEncryptionKey, payload, publicUserId);
+  Future<bool?> easyKeyriAuth(
+      String appKey,
+      String? publicApiKey,
+      String? serviceEncryptionKey,
+      bool? blockEmulatorDetection,
+      String payload,
+      String? publicUserId) {
+    return KeyriPlatform.instance.easyKeyriAuth(appKey, publicApiKey,
+        serviceEncryptionKey, blockEmulatorDetection, payload, publicUserId);
   }
 
   Future<String?> generateAssociationKey(String publicUserId) {
     return KeyriPlatform.instance.generateAssociationKey(publicUserId);
   }
 
-  Future<String?> getUserSignature(
-      String? publicUserId, String customSignedData) {
-    return KeyriPlatform.instance
-        .getUserSignature(publicUserId, customSignedData);
+  Future<String?> generateUserSignature(String? publicUserId, String data) {
+    return KeyriPlatform.instance.generateUserSignature(publicUserId, data);
   }
 
-  Future<Map<String, String>> listAssociationKey() {
-    return KeyriPlatform.instance.listAssociationKey();
+  Future<Map<String, String>> listAssociationKeys() {
+    return KeyriPlatform.instance.listAssociationKeys();
   }
 
   Future<Map<String, String>> listUniqueAccounts() {
@@ -39,7 +42,7 @@ class Keyri {
     return KeyriPlatform.instance.getAssociationKey(publicUserId);
   }
 
-  Future<void> removeAssociationKey(String publicUserId) {
+  Future<bool> removeAssociationKey(String publicUserId) {
     return KeyriPlatform.instance.removeAssociationKey(publicUserId);
   }
 
@@ -48,27 +51,23 @@ class Keyri {
     return KeyriPlatform.instance.sendEvent(publicUserId, eventType, success);
   }
 
-  Future<Session?> initiateQrSession(
-      String appKey, String sessionId, String? publicUserId) {
-    return KeyriPlatform.instance
-        .initiateQrSession(appKey, sessionId, publicUserId);
+  Future<Session?> initiateQrSession(String sessionId, String? publicUserId) {
+    return KeyriPlatform.instance.initiateQrSession(sessionId, publicUserId);
   }
 
-  Future<void> initializeDefaultScreen(String sessionId, String payload) {
+  Future<bool> initializeDefaultScreen(String sessionId, String payload) {
     return KeyriPlatform.instance.initializeDefaultScreen(sessionId, payload);
   }
 
-  Future<void> processLink(
-      String link, String appKey, String payload, String publicUserId) {
-    return KeyriPlatform.instance
-        .processLink(link, appKey, payload, publicUserId);
+  Future<bool> processLink(String link, String payload, String publicUserId) {
+    return KeyriPlatform.instance.processLink(link, payload, publicUserId);
   }
 
-  Future<void> confirmSession(String sessionId, String payload) {
+  Future<bool> confirmSession(String sessionId, String payload) {
     return KeyriPlatform.instance.confirmSession(sessionId, payload);
   }
 
-  Future<void> denySession(String sessionId, String payload) {
+  Future<bool> denySession(String sessionId, String payload) {
     return KeyriPlatform.instance.denySession(sessionId, payload);
   }
 }

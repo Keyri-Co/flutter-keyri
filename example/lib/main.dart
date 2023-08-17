@@ -9,6 +9,8 @@ void main() {
 const String appKey = "[Your app key here]"; // Change it before launch
 const String? publicApiKey = null; // Change it before launch, optional
 const String? serviceEncryptionKey = null; // Change it before launch, optional
+const bool blockEmulatorDetection = true;
+const String? publicUserId = null; // Change it before launch, optional
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -55,7 +57,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   void _easyKeyriAuth() {
     keyri
         .easyKeyriAuth(appKey, publicApiKey, serviceEncryptionKey,
-            'Some payload', 'Public user ID')
+            blockEmulatorDetection, 'Some payload', publicUserId)
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
         .catchError((error, stackTrace) => _onError(error));
   }
@@ -151,7 +153,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
     await keyri.initialize(appKey, publicApiKey, serviceEncryptionKey, true);
 
     keyri
-        .initiateQrSession(appKey, sessionId, 'Public user ID')
+        .initiateQrSession(sessionId, publicUserId)
         .then((session) => keyri
             .initializeDefaultScreen(sessionId, 'Some payload')
             .then((authResult) => _onAuthResult(authResult))
@@ -168,9 +170,15 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
     });
   }
 
-  void _onAuthResult(void result) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Successfully authenticated!')));
+  void _onAuthResult(bool result) {
+    var successfullyAuthenticatedText = 'Successfully authenticated!';
+
+    if (!result) {
+      successfullyAuthenticatedText = 'Failed to authenticate';
+    }
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(successfullyAuthenticatedText)));
 
     setState(() {
       _isLoading = false;

@@ -2,10 +2,11 @@ import 'dart:convert';
 
 class FingerprintEventResponse {
   FingerprintEventResponse(
-      this.keyriEncryptionPublicKey, this.encryptedPayload, this.iv, this.salt);
+      this.apiCiphertextSignature, this.publicEncryptionKey, this.ciphertext, this.iv, this.salt);
 
-  final String keyriEncryptionPublicKey;
-  final String encryptedPayload;
+  final String apiCiphertextSignature;
+  final String publicEncryptionKey;
+  final String ciphertext;
   final String iv;
   final String salt;
 
@@ -20,8 +21,9 @@ class FingerprintEventResponse {
     }
 
     return FingerprintEventResponse(
-        jsonData['keyriEncryptionPublicKey'] as String,
-        jsonData['encryptedPayload'] as String,
+        jsonData['apiCiphertextSignature'] as String,
+        jsonData['publicEncryptionKey'] as String,
+        jsonData['ciphertext'] as String,
         jsonData['iv'] as String,
         jsonData['salt'] as String);
   }

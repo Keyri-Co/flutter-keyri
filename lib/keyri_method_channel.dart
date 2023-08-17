@@ -13,7 +13,7 @@ class MethodChannelKeyri extends KeyriPlatform {
   final methodChannel = const MethodChannel('keyri');
 
   @override
-  Future<bool?> initialize(String appKey, String? publicApiKey,
+  Future<bool> initialize(String appKey, String? publicApiKey,
       String? serviceEncryptionKey, bool? blockEmulatorDetection) async {
     return await methodChannel.invokeMethod<bool>('initialize', {
           'appKey': appKey,
@@ -25,16 +25,18 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<bool?> easyKeyriAuth(
+  Future<bool> easyKeyriAuth(
       String appKey,
       String? publicApiKey,
       String? serviceEncryptionKey,
+      bool? blockEmulatorDetection,
       String payload,
       String? publicUserId) async {
     return await methodChannel.invokeMethod<bool>('easyKeyriAuth', {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
+          'blockEmulatorDetection': blockEmulatorDetection.toString(),
           'payload': payload,
           'publicUserId': publicUserId
         }) ??
@@ -48,16 +50,16 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<String?> getUserSignature(
-      String? publicUserId, String customSignedData) async {
-    return await methodChannel.invokeMethod<String?>('getUserSignature',
-        {'publicUserId': publicUserId, 'customSignedData': customSignedData});
+  Future<String?> generateUserSignature(
+      String? publicUserId, String data) async {
+    return await methodChannel.invokeMethod<String?>(
+        'generateUserSignature', {'publicUserId': publicUserId, 'data': data});
   }
 
   @override
-  Future<Map<String, String>> listAssociationKey() async {
+  Future<Map<String, String>> listAssociationKeys() async {
     return await methodChannel
-        .invokeMethod<Map<String, String>?>('listAssociationKey')
+        .invokeMethod<Map<String, String>?>('listAssociationKeys')
         .then<Map<String, String>>((Map<String, String>? value) => value ?? {});
   }
 
@@ -75,9 +77,10 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<void> removeAssociationKey(String publicUserId) async {
-    return await methodChannel.invokeMethod<void>(
-        'removeAssociationKey', {'publicUserId': publicUserId});
+  Future<bool> removeAssociationKey(String publicUserId) async {
+    return await methodChannel.invokeMethod<bool>(
+            'removeAssociationKey', {'publicUserId': publicUserId}) ??
+        false;
   }
 
   @override
@@ -93,13 +96,10 @@ class MethodChannelKeyri extends KeyriPlatform {
 
   @override
   Future<Session> initiateQrSession(
-      String appKey, String sessionId, String? publicUserId) async {
+      String sessionId, String? publicUserId) async {
     dynamic sessionObject = await methodChannel.invokeMethod<dynamic>(
-        'initiateQrSession', {
-      'appKey': appKey,
-      'sessionId': sessionId,
-      'publicUserId': publicUserId
-    });
+        'initiateQrSession',
+        {'sessionId': sessionId, 'publicUserId': publicUserId});
 
     return Session.fromJson(sessionObject);
   }
@@ -112,14 +112,16 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<void> confirmSession(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<void>(
-        'confirmSession', {'sessionId': sessionId, 'payload': payload});
+  Future<bool> confirmSession(String sessionId, String payload) async {
+    return await methodChannel.invokeMethod<bool>(
+            'confirmSession', {'sessionId': sessionId, 'payload': payload}) ??
+        false;
   }
 
   @override
-  Future<void> denySession(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<void>(
-        'denySession', {'sessionId': sessionId, 'payload': payload});
+  Future<bool> denySession(String sessionId, String payload) async {
+    return await methodChannel.invokeMethod<bool>(
+            'denySession', {'sessionId': sessionId, 'payload': payload}) ??
+        false;
   }
 }
