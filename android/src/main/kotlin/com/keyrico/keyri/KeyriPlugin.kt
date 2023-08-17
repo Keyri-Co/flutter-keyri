@@ -33,7 +33,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     private lateinit var channel: MethodChannel
     private lateinit var keyri: Keyri
 
-    private val sessions = mutableListOf<Session>()
+    private var activeSession: Session? = null
 
     private var easyKeyriAuthResult: MethodChannel.Result? = null
     private var activity: Activity? = null
@@ -125,12 +125,10 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 initiateQrSession(sessionId, publicUserId, result)
             }
 
-            "initializeDefaultConfirmationScreen" -> {
-                val sessionId = arguments?.get("sessionId")
-                val payload = arguments?.get("payload")
-
-                initializeDefaultScreen(sessionId, payload, result)
-            }
+            "initializeDefaultConfirmationScreen" -> initializeDefaultConfirmationScreen(
+                arguments?.get("payload"),
+                result
+            )
 
             "processLink" -> {
                 val link = arguments?.get("link")
@@ -141,20 +139,13 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             }
 
             "confirmSession" -> {
-                val sessionId = arguments?.get("sessionId")
                 val payload = arguments?.get("payload")
                 val trustNewBrowser = arguments?.get("trustNewBrowser")?.toBoolean() ?: false
 
-                confirmSession(sessionId, payload, trustNewBrowser, result)
+                confirmSession(payload, trustNewBrowser, result)
             }
 
-            "denySession" -> {
-                val sessionId = arguments?.get("sessionId")
-                val payload = arguments?.get("payload")
-
-                denySession(sessionId, payload, result)
-            }
-
+            "denySession" -> denySession(arguments?.get("payload"), result)
             else -> result.notImplemented()
         }
     }
@@ -178,7 +169,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             easyKeyriAuthResult?.success(resultCode == Activity.RESULT_OK)
         }
 
-        return false
+        return requestCode == AUTH_REQUEST_CODE
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
@@ -338,7 +329,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 result.error("initiateQrSession", "sessionId must not be null", null)
             } else {
                 keyri.initiateQrSession(sessionId, publicUserId).onSuccess { session ->
-                    sessions.add(session)
+                    activeSession = session
 
                     result.success(Gson().toJson(session))
                 }.onFailure {
@@ -348,24 +339,29 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initializeDefaultScreen(
-        sessionId: String?,
+    private fun initializeDefaultConfirmationScreen(
         payload: String?,
         result: MethodChannel.Result
     ) {
-        keyriCoroutineScope("initializeDefaultScreen", result::error).launch {
-            val session = findSession(sessionId)
-
-            if (session == null) {
-                result.error("initializeDefaultScreen", "Can't find session", null)
+        keyriCoroutineScope("initializeDefaultConfirmationScreen", result::error).launch {
+            if (activeSession == null) {
+                result.error("initializeDefaultConfirmationScreen", "Can't find session", null)
             } else if (payload == null) {
-                result.error("initializeDefaultScreen", "payload must not be null", null)
+                result.error(
+                    "initializeDefaultConfirmationScreen",
+                    "payload must not be null",
+                    null
+                )
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                    keyri.initializeDefaultConfirmationScreen(fm, session, payload).getOrThrow()
+                    keyri.initializeDefaultConfirmationScreen(
+                        fm,
+                        requireNotNull(activeSession),
+                        payload
+                    ).getOrThrow()
                     result.success(true)
                 } ?: result.error(
-                    "initializeDefaultScreen",
+                    "initializeDefaultConfirmationScreen",
                     "To Use this method, make sure your host Activity extended from FlutterFragmentActivity",
                     null
                 )
@@ -393,34 +389,39 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun confirmSession(sessionId: String?, payload: String?, trustNewBrowser: Boolean, result: MethodChannel.Result) {
+    private fun confirmSession(
+        payload: String?,
+        trustNewBrowser: Boolean,
+        result: MethodChannel.Result
+    ) {
         keyriCoroutineScope("confirmSession", result::error).launch {
-            val session = findSession(sessionId)
-
-            if (session == null) {
+            if (activeSession == null) {
                 result.error("confirmSession", "Can't find session", null)
             } else if (payload == null) {
                 result.error("confirmSession", "payload must not be null", null)
             } else {
-                session.confirm(payload, requireNotNull(activity), trustNewBrowser).onSuccess {
-                    result.success(true)
-                }.onFailure {
-                    result.error("confirmSession", it.message, null)
-                }
+                requireNotNull(activeSession).confirm(
+                    payload,
+                    requireNotNull(activity),
+                    trustNewBrowser
+                )
+                    .onSuccess {
+                        result.success(true)
+                    }.onFailure {
+                        result.error("confirmSession", it.message, null)
+                    }
             }
         }
     }
 
-    private fun denySession(sessionId: String?, payload: String?, result: MethodChannel.Result) {
+    private fun denySession(payload: String?, result: MethodChannel.Result) {
         keyriCoroutineScope("denySession", result::error).launch {
-            val session = findSession(sessionId)
-
-            if (session == null) {
+            if (activeSession == null) {
                 result.error("denySession", "Can't find session", null)
             } else if (payload == null) {
                 result.error("denySession", "payload must not be null", null)
             } else {
-                session.deny(payload, requireNotNull(activity)).onSuccess {
+                requireNotNull(activeSession).deny(payload, requireNotNull(activity)).onSuccess {
                     result.success(true)
                 }.onFailure {
                     result.error("denySession", it.message, null)
@@ -428,9 +429,6 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             }
         }
     }
-
-    private fun findSession(sessionId: String?): Session? =
-        sessions.firstOrNull { it.sessionId == sessionId }
 
     private fun keyriCoroutineScope(
         methodName: String,

@@ -47,8 +47,8 @@ android {
 
 dependencies {
     // Keyri
-    implementation 'com.keyri:keyrisdk:3.3.1'
-    implementation 'com.keyri:scanner:3.3.1'
+    implementation 'com.keyri:keyrisdk:3.3.2'
+    implementation 'com.keyri:scanner:3.3.2'
 
     // Gson
     implementation 'com.google.code.gson:gson:2.10.1'

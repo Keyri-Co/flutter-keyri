@@ -34,12 +34,10 @@ class KeyriHomePage extends StatefulWidget {
 }
 
 class _KeyriHomePageState extends State<KeyriHomePage> {
-  Keyri keyri = Keyri();
+  Keyri keyri = Keyri(appKey, publicApiKey, serviceEncryptionKey, true);
 
   @override
   Widget build(BuildContext context) {
-    keyri.initialize(appKey, publicApiKey, serviceEncryptionKey, true);
-
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
@@ -105,7 +103,7 @@ class KeyriScannerAuthPage extends StatefulWidget {
 class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   bool _isLoading = false;
 
-  Keyri keyri = Keyri();
+  Keyri keyri = Keyri(appKey, publicApiKey, serviceEncryptionKey, true);
 
   void onMobileScannerDetect(Barcode barcode, MobileScannerArguments? args) {
     if (barcode.rawValue == null) {
@@ -150,12 +148,10 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   Future<void> _onReadSessionId(String sessionId) async {
-    await keyri.initialize(appKey, publicApiKey, serviceEncryptionKey, true);
-
     keyri
         .initiateQrSession(sessionId, publicUserId)
         .then((session) => keyri
-            .initializeDefaultConfirmationScreen(sessionId, 'Some payload')
+            .initializeDefaultConfirmationScreen('Some payload')
             .then((authResult) => _onAuthResult(authResult))
             .catchError((error, stackTrace) => _onError(error.toString())))
         .catchError((error, stackTrace) => _onError(error.toString()));

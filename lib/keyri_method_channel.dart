@@ -84,14 +84,16 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<FingerprintEventResponse?> sendEvent(
+  Future<FingerprintEventResponse> sendEvent(
       String publicUserId, EventType eventType, bool success) async {
-    return await methodChannel.invokeMethod<FingerprintEventResponse?>(
-        'sendEvent', {
+    dynamic fingerprintEventResponseObject =
+        await methodChannel.invokeMethod<dynamic>('sendEvent', {
       'publicUserId': publicUserId,
       'eventType': eventType.name,
-      'success': success
+      'success': success.toString()
     });
+
+    return FingerprintEventResponse.fromJson(fingerprintEventResponseObject);
   }
 
   @override
@@ -105,29 +107,25 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<bool> initializeDefaultConfirmationScreen(
-      String sessionId, String payload) async {
+  Future<bool> initializeDefaultConfirmationScreen(String payload) async {
     return await methodChannel.invokeMethod<bool>(
-            'initializeDefaultConfirmationScreen',
-            {'sessionId': sessionId, 'payload': payload}) ??
+            'initializeDefaultConfirmationScreen', {'payload': payload}) ??
         false;
   }
 
   @override
-  Future<bool> confirmSession(
-      String sessionId, String payload, bool trustNewBrowser) async {
+  Future<bool> confirmSession(String payload, bool trustNewBrowser) async {
     return await methodChannel.invokeMethod<bool>('confirmSession', {
-          'sessionId': sessionId,
           'payload': payload,
-          'trustNewBrowser': trustNewBrowser
+          'trustNewBrowser': trustNewBrowser.toString()
         }) ??
         false;
   }
 
   @override
-  Future<bool> denySession(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<bool>(
-            'denySession', {'sessionId': sessionId, 'payload': payload}) ??
+  Future<bool> denySession(String payload) async {
+    return await methodChannel
+            .invokeMethod<bool>('denySession', {'payload': payload}) ??
         false;
   }
 }

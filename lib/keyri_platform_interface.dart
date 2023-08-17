@@ -26,7 +26,7 @@ abstract class KeyriPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<bool?> initialize(String appKey, String? publicApiKey,
+  Future<bool> initialize(String appKey, String? publicApiKey,
       String? serviceEncryptionKey, bool? blockEmulatorDetection) {
     throw UnimplementedError('initialize() has not been implemented.');
   }
@@ -68,7 +68,7 @@ abstract class KeyriPlatform extends PlatformInterface {
         'removeAssociationKey() has not been implemented.');
   }
 
-  Future<FingerprintEventResponse?> sendEvent(
+  Future<FingerprintEventResponse> sendEvent(
       String publicUserId, EventType eventType, bool success) {
     throw UnimplementedError('sendEvent() has not been implemented.');
   }
@@ -77,7 +77,7 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('initiateQrSession() has not been implemented.');
   }
 
-  Future<bool> initializeDefaultConfirmationScreen(String sessionId, String payload) {
+  Future<bool> initializeDefaultConfirmationScreen(String payload) {
     throw UnimplementedError(
         'initializeDefaultConfirmationScreen() has not been implemented.');
   }
@@ -86,12 +86,11 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('processLink() has not been implemented.');
   }
 
-  Future<bool> confirmSession(
-      String sessionId, String payload, bool trustNewBrowser) {
+  Future<bool> confirmSession(String payload, bool trustNewBrowser) {
     throw UnimplementedError('confirmSession() has not been implemented.');
   }
 
-  Future<bool> denySession(String sessionId, String payload) {
+  Future<bool> denySession(String payload) {
     throw UnimplementedError('denySession() has not been implemented.');
   }
 }
