@@ -186,9 +186,9 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
 
         if call.method == "confirmSession" {
             if let args = call.arguments as? [String: String],
-               let sessionId = args["sessionId"],
+               let payload = args["payload"],
                let trustNewBrowser = args["trustNewBrowser"] { // TODO As Boolean
-                activeSession?.confirm()
+                activeSession?.confirm(payload, trustNewBrowser)
                 result(true)
             } else {
                 result(false)
@@ -197,8 +197,8 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
         
         if call.method == "denySession" {
             if let args = call.arguments as? [String: String],
-               let sessionId = args["sessionId"] {
-                activeSession?.deny()
+               let payload = args["payload"] { // TODO As Boolean
+                activeSession?.deny(payload)
                 result(true)
             } else {
                 result(false)

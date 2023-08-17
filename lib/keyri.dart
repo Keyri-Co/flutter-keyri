@@ -5,10 +5,24 @@ import 'keyri_fingerprint_event.dart';
 import 'keyri_platform_interface.dart';
 
 class Keyri {
-  Future<bool?> initialize(String appKey, String? publicApiKey,
-      String? serviceEncryptionKey, bool? blockEmulatorDetection) {
-    return KeyriPlatform.instance.initialize(
-        appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection);
+  String appKey = '';
+  String? publicApiKey;
+  String? serviceEncryptionKey;
+  bool blockEmulatorDetection = true;
+
+  Keyri(this.appKey, this.publicApiKey, this.serviceEncryptionKey,
+      this.blockEmulatorDetection) {
+    if (appKey.isEmpty) {
+      throw Exception('You need to specify appKey');
+    }
+
+    KeyriPlatform.instance
+        .initialize(
+            appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection)
+        .then((isInitialized) => {
+              if (!isInitialized)
+                {throw Exception('You need to specify appKey')}
+            });
   }
 
   Future<bool?> easyKeyriAuth(
@@ -46,7 +60,7 @@ class Keyri {
     return KeyriPlatform.instance.removeAssociationKey(publicUserId);
   }
 
-  Future<FingerprintEventResponse?> sendEvent(
+  Future<FingerprintEventResponse> sendEvent(
       String publicUserId, EventType eventType, bool success) {
     return KeyriPlatform.instance.sendEvent(publicUserId, eventType, success);
   }
@@ -55,19 +69,19 @@ class Keyri {
     return KeyriPlatform.instance.initiateQrSession(sessionId, publicUserId);
   }
 
-  Future<bool> initializeDefaultConfirmationScreen(String sessionId, String payload) {
-    return KeyriPlatform.instance.initializeDefaultConfirmationScreen(sessionId, payload);
+  Future<bool> initializeDefaultConfirmationScreen(String payload) {
+    return KeyriPlatform.instance.initializeDefaultConfirmationScreen(payload);
   }
 
   Future<bool> processLink(String link, String payload, String publicUserId) {
     return KeyriPlatform.instance.processLink(link, payload, publicUserId);
   }
 
-  Future<bool> confirmSession(String sessionId, String payload, bool trustNewBrowser) {
-    return KeyriPlatform.instance.confirmSession(sessionId, payload, trustNewBrowser);
+  Future<bool> confirmSession(String payload, bool trustNewBrowser) {
+    return KeyriPlatform.instance.confirmSession(payload, trustNewBrowser);
   }
 
-  Future<bool> denySession(String sessionId, String payload) {
-    return KeyriPlatform.instance.denySession(sessionId, payload);
+  Future<bool> denySession(String payload) {
+    return KeyriPlatform.instance.denySession(payload);
   }
 }
