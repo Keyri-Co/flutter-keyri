@@ -8,8 +8,7 @@ import com.google.gson.Gson
 import com.keyrico.keyrisdk.Keyri
 import com.keyrico.scanner.easyKeyriAuth
 import com.keyrico.keyrisdk.exception.DenialException
-import com.keyrico.keyrisdk.sec.fingerprint.enums.EventType
-import com.keyrico.keyrisdk.sec.fingerprint.enums.FingerprintLogResult
+import com.keyrico.keyrisdk.sec.fraud.enums.EventType
 import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.entity.session.Session
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -266,7 +265,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else {
                 val userSignature = publicUserId?.let {
                     keyri.generateUserSignature(it, data).getOrThrow()
-                } ?: keyri.generateUserSignature(data = customSignedData).getOrThrow()
+                } ?: keyri.generateUserSignature(data = data).getOrThrow()
 
                 result.success(userSignature)
             }
@@ -394,7 +393,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun confirmSession(sessionId: String?, payload: String?, result: MethodChannel.Result) {
+    private fun confirmSession(sessionId: String?, payload: String?, trustNewBrowser: Boolean, result: MethodChannel.Result) {
         keyriCoroutineScope("confirmSession", result::error).launch {
             val session = findSession(sessionId)
 
@@ -403,7 +402,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             } else if (payload == null) {
                 result.error("confirmSession", "payload must not be null", null)
             } else {
-                session.confirm(payload, requireNotNull(activity)).onSuccess {
+                session.confirm(payload, requireNotNull(activity), trustNewBrowser).onSuccess {
                     result.success(true)
                 }.onFailure {
                     result.error("confirmSession", it.message, null)
@@ -435,7 +434,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     private fun keyriCoroutineScope(
         methodName: String,
-        errorCallback: (errorCode: String, errorMessage: String, errorDetails: Any) -> Unit
+        errorCallback: (errorCode: String, errorMessage: String, errorDetails: Any?) -> Unit
     ): CoroutineScope {
         val exceptionHandler = CoroutineExceptionHandler { _, e ->
             errorCallback(methodName, e.message ?: "Error calling $methodName method", null)

@@ -55,16 +55,16 @@ class Keyri {
     return KeyriPlatform.instance.initiateQrSession(sessionId, publicUserId);
   }
 
-  Future<bool> initializeDefaultScreen(String sessionId, String payload) {
-    return KeyriPlatform.instance.initializeDefaultScreen(sessionId, payload);
+  Future<bool> initializeDefaultConfirmationScreen(String sessionId, String payload) {
+    return KeyriPlatform.instance.initializeDefaultConfirmationScreen(sessionId, payload);
   }
 
   Future<bool> processLink(String link, String payload, String publicUserId) {
     return KeyriPlatform.instance.processLink(link, payload, publicUserId);
   }
 
-  Future<bool> confirmSession(String sessionId, String payload) {
-    return KeyriPlatform.instance.confirmSession(sessionId, payload);
+  Future<bool> confirmSession(String sessionId, String payload, bool trustNewBrowser) {
+    return KeyriPlatform.instance.confirmSession(sessionId, payload, trustNewBrowser);
   }
 
   Future<bool> denySession(String sessionId, String payload) {

@@ -60,7 +60,7 @@ abstract class KeyriPlatform extends PlatformInterface {
   }
 
   Future<String?> getAssociationKey(String publicUserId) {
-    throw UnimplementedError('listAssociationKey() has not been implemented.');
+    throw UnimplementedError('getAssociationKey() has not been implemented.');
   }
 
   Future<bool> removeAssociationKey(String publicUserId) {
@@ -77,16 +77,17 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('initiateQrSession() has not been implemented.');
   }
 
-  Future<bool> initializeDefaultScreen(String sessionId, String payload) {
+  Future<bool> initializeDefaultConfirmationScreen(String sessionId, String payload) {
     throw UnimplementedError(
-        'initializeDefaultScreen() has not been implemented.');
+        'initializeDefaultConfirmationScreen() has not been implemented.');
   }
 
   Future<bool> processLink(String link, String payload, String publicUserId) {
     throw UnimplementedError('processLink() has not been implemented.');
   }
 
-  Future<bool> confirmSession(String sessionId, String payload) {
+  Future<bool> confirmSession(
+      String sessionId, String payload, bool trustNewBrowser) {
     throw UnimplementedError('confirmSession() has not been implemented.');
   }
 

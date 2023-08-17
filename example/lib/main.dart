@@ -86,8 +86,8 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   Widget button(VoidCallback onPressedCallback, String text) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        primary: Colors.deepPurple,
-        onPrimary: Colors.white,
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.deepPurple,
       ),
       onPressed: onPressedCallback,
       child: Text(text),
@@ -155,7 +155,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
     keyri
         .initiateQrSession(sessionId, publicUserId)
         .then((session) => keyri
-            .initializeDefaultScreen(sessionId, 'Some payload')
+            .initializeDefaultConfirmationScreen(sessionId, 'Some payload')
             .then((authResult) => _onAuthResult(authResult))
             .catchError((error, stackTrace) => _onError(error.toString())))
         .catchError((error, stackTrace) => _onError(error.toString()));

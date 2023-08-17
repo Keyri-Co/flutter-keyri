@@ -105,16 +105,22 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<bool> initializeDefaultScreen(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<bool>('initializeDefaultScreen',
+  Future<bool> initializeDefaultConfirmationScreen(
+      String sessionId, String payload) async {
+    return await methodChannel.invokeMethod<bool>(
+            'initializeDefaultConfirmationScreen',
             {'sessionId': sessionId, 'payload': payload}) ??
         false;
   }
 
   @override
-  Future<bool> confirmSession(String sessionId, String payload) async {
-    return await methodChannel.invokeMethod<bool>(
-            'confirmSession', {'sessionId': sessionId, 'payload': payload}) ??
+  Future<bool> confirmSession(
+      String sessionId, String payload, bool trustNewBrowser) async {
+    return await methodChannel.invokeMethod<bool>('confirmSession', {
+          'sessionId': sessionId,
+          'payload': payload,
+          'trustNewBrowser': trustNewBrowser
+        }) ??
         false;
   }
 
