@@ -44,7 +44,7 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<String?> generateAssociationKey(String publicUserId) async {
+  Future<String?> generateAssociationKey(String? publicUserId) async {
     return await methodChannel.invokeMethod<String?>(
         'generateAssociationKey', {'publicUserId': publicUserId});
   }
@@ -58,20 +58,37 @@ class MethodChannelKeyri extends KeyriPlatform {
 
   @override
   Future<Map<String, String>> listAssociationKeys() async {
-    return await methodChannel
-        .invokeMethod<Map<String, String>?>('listAssociationKeys')
-        .then<Map<String, String>>((Map<String, String>? value) => value ?? {});
+    final dynamic result =
+        await methodChannel.invokeMethod('listAssociationKeys');
+    final Map<String, String> resultMap = {};
+
+    result.forEach((key, value) {
+      if (key is String && value is String) {
+        resultMap[key] = value;
+      }
+    });
+
+    return Future.value(resultMap);
   }
 
   @override
   Future<Map<String, String>> listUniqueAccounts() async {
-    return await methodChannel
-        .invokeMethod<Map<String, String>?>('listUniqueAccounts')
-        .then<Map<String, String>>((Map<String, String>? value) => value ?? {});
+    final dynamic result =
+        await methodChannel.invokeMethod('listUniqueAccounts');
+
+    final Map<String, String> resultMap = {};
+
+    result.forEach((key, value) {
+      if (key is String && value is String) {
+        resultMap[key] = value;
+      }
+    });
+
+    return Future.value(resultMap);
   }
 
   @override
-  Future<String?> getAssociationKey(String publicUserId) async {
+  Future<String?> getAssociationKey(String? publicUserId) async {
     return await methodChannel.invokeMethod<String?>(
         'getAssociationKey', {'publicUserId': publicUserId});
   }
@@ -85,7 +102,7 @@ class MethodChannelKeyri extends KeyriPlatform {
 
   @override
   Future<FingerprintEventResponse> sendEvent(
-      String publicUserId, EventType eventType, bool success) async {
+      String? publicUserId, EventType eventType, bool success) async {
     dynamic fingerprintEventResponseObject =
         await methodChannel.invokeMethod<dynamic>('sendEvent', {
       'publicUserId': publicUserId,
