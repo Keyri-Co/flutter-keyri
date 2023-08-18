@@ -41,7 +41,7 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('easyKeyriAuth() has not been implemented.');
   }
 
-  Future<String?> generateAssociationKey(String publicUserId) {
+  Future<String?> generateAssociationKey(String? publicUserId) {
     throw UnimplementedError(
         'generateAssociationKey() has not been implemented.');
   }
@@ -59,7 +59,7 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('listUniqueAccounts() has not been implemented.');
   }
 
-  Future<String?> getAssociationKey(String publicUserId) {
+  Future<String?> getAssociationKey(String? publicUserId) {
     throw UnimplementedError('getAssociationKey() has not been implemented.');
   }
 
@@ -69,7 +69,7 @@ abstract class KeyriPlatform extends PlatformInterface {
   }
 
   Future<FingerprintEventResponse> sendEvent(
-      String publicUserId, EventType eventType, bool success) {
+      String? publicUserId, EventType eventType, bool success) {
     throw UnimplementedError('sendEvent() has not been implemented.');
   }
 
@@ -82,7 +82,7 @@ abstract class KeyriPlatform extends PlatformInterface {
         'initializeDefaultConfirmationScreen() has not been implemented.');
   }
 
-  Future<bool> processLink(String link, String payload, String publicUserId) {
+  Future<bool> processLink(String link, String payload, String? publicUserId) {
     throw UnimplementedError('processLink() has not been implemented.');
   }
 

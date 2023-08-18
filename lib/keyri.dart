@@ -36,7 +36,7 @@ class Keyri {
         serviceEncryptionKey, blockEmulatorDetection, payload, publicUserId);
   }
 
-  Future<String?> generateAssociationKey(String publicUserId) {
+  Future<String?> generateAssociationKey(String? publicUserId) {
     return KeyriPlatform.instance.generateAssociationKey(publicUserId);
   }
 
@@ -52,7 +52,7 @@ class Keyri {
     return KeyriPlatform.instance.listUniqueAccounts();
   }
 
-  Future<String?> getAssociationKey(String publicUserId) {
+  Future<String?> getAssociationKey(String? publicUserId) {
     return KeyriPlatform.instance.getAssociationKey(publicUserId);
   }
 
@@ -61,7 +61,7 @@ class Keyri {
   }
 
   Future<FingerprintEventResponse> sendEvent(
-      String publicUserId, EventType eventType, bool success) {
+      String? publicUserId, EventType eventType, bool success) {
     return KeyriPlatform.instance.sendEvent(publicUserId, eventType, success);
   }
 
@@ -73,7 +73,7 @@ class Keyri {
     return KeyriPlatform.instance.initializeDefaultConfirmationScreen(payload);
   }
 
-  Future<bool> processLink(String link, String payload, String publicUserId) {
+  Future<bool> processLink(String link, String payload, String? publicUserId) {
     return KeyriPlatform.instance.processLink(link, payload, publicUserId);
   }
 
