@@ -1,4 +1,4 @@
-import 'package:keyri/session.dart';
+import 'package:keyri_v3/session.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'fingerprint_event_response.dart';
