@@ -19,7 +19,7 @@ dependencies:
     sdk: flutter
   http: ^0.13.4
 
-  keyri:
+  keyri_v3:
     # When depending on this package from a real application you should use:
     #   keyri: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints

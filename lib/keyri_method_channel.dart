@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:keyri/fingerprint_event_response.dart';
-import 'package:keyri/session.dart';
+import 'package:keyri_v3/fingerprint_event_response.dart';
+import 'package:keyri_v3/session.dart';
 
 import 'keyri_fingerprint_event.dart';
 import 'keyri_platform_interface.dart';

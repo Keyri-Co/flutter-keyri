@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keyri/keyri.dart';
+import 'package:keyri_v3/keyri.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 void main() {
