@@ -25,13 +25,7 @@ class Keyri {
             });
   }
 
-  Future<bool?> easyKeyriAuth(
-      String appKey,
-      String? publicApiKey,
-      String? serviceEncryptionKey,
-      bool? blockEmulatorDetection,
-      String payload,
-      String? publicUserId) {
+  Future<bool?> easyKeyriAuth(String payload, String? publicUserId) {
     return KeyriPlatform.instance.easyKeyriAuth(appKey, publicApiKey,
         serviceEncryptionKey, blockEmulatorDetection, payload, publicUserId);
   }

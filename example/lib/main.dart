@@ -54,8 +54,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   void _easyKeyriAuth() {
     keyri
-        .easyKeyriAuth(appKey, publicApiKey, serviceEncryptionKey,
-            blockEmulatorDetection, 'Some payload', publicUserId)
+        .easyKeyriAuth('Some payload', publicUserId)
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
         .catchError((error, stackTrace) => _onError(error));
   }
