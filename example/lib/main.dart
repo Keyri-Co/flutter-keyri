@@ -104,25 +104,30 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
 
   Keyri keyri = Keyri(appKey, publicApiKey, serviceEncryptionKey, true);
 
-  void onMobileScannerDetect(Barcode barcode, MobileScannerArguments? args) {
-    if (barcode.rawValue == null) {
-      debugPrint('Failed to scan Barcode');
-      return;
+  void onMobileScannerDetect(BarcodeCapture barcodes) {
+    if (barcodes.barcodes.isNotEmpty) {
+      var barcode = barcodes.barcodes[0];
+
+      if (barcode.rawValue == null) {
+        debugPrint('Failed to scan Barcode');
+        return;
+      }
+
+      final String? code = barcode.rawValue;
+      debugPrint('Scanned barcode: $code');
+
+      if (code == null) return;
+
+      var sessionId = Uri.dataFromString(code).queryParameters['sessionId'];
+
+      if (sessionId == null) return;
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      _onReadSessionId(sessionId);
     }
-
-    final String? code = barcode.rawValue;
-    debugPrint('Scanned barcode: $code');
-
-    if (code == null) return;
-
-    var sessionId = Uri.dataFromString(code).queryParameters['sessionId'];
-
-    if (sessionId == null) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-    _onReadSessionId(sessionId);
   }
 
   @override
@@ -138,8 +143,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [CircularProgressIndicator()]))
-                : MobileScanner(
-                    allowDuplicates: false, onDetect: onMobileScannerDetect),
+                : MobileScanner(onDetect: onMobileScannerDetect),
           )
         ],
       ),
