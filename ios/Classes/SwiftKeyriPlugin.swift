@@ -1,135 +1,144 @@
 import Flutter
 import UIKit
-import keyri_pod
+import Keyri
 
 public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
     var activeSession: Session?
-    let keyri = Keyri()
-
+    var keyri: KeyriInterface?
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "keyri", binaryMessenger: registrar.messenger())
         let instance = SwiftKeyriPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
-
+    
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-            if call.method == "initialize" {
-            // TODO initialize Keyri object
-                if let args = call.arguments as? [String: String],
-                   let appKey = args["appKey"],
-                   let publicApiKey = args["publicApiKey"],
-                   let serviceEncryptionKey = args["serviceEncryptionKey"],
-//                    let blockEmulatorDetection = args["blockEmulatorDetection"] // TODO as Bool {
-//                    let blockEmulatorDetection = args["blockEmulatorDetection"] {
-//                     keyri.easyKeyriAuth(publicUserId: username, appKey: appKey, payload: payload) { didSucceed in
-//                         switch didSucceed {
-//                         case.failure:
-//                             result(false)
-//                         case .success(let bool):
-//                             result(bool)
-//                         }
-//                     }
-//                 }
-            }
-
-        if call.method == "easyKeyriAuth" {
+        if call.method == "initialize" {
             if let args = call.arguments as? [String: String],
                let appKey = args["appKey"],
                let publicApiKey = args["publicApiKey"],
                let serviceEncryptionKey = args["serviceEncryptionKey"],
-               let blockEmulatorDetection = args["blockEmulatorDetection"], // TODO As Bool
+               let blockEmulatorDetection = args["blockEmulatorDetection"] {
+                keyri = KeyriInterface(appKey: appKey, publicApiKey: publicApiKey, serviceEncryptionKey: serviceEncryptionKey, blockEmulatorDetection: Bool(blockEmulatorDetection))
+            } else {
+                result("failed to parse arguments")
+            }
+        }
+        
+        if call.method == "easyKeyriAuth" {
+            if let args = call.arguments as? [String: String],
                let payload = args["payload"],
                let publicUserId = args["publicUserId"] {
-                keyri.easyKeyriAuth(
-                    appKey: appKey,
-                    publicApiKey: publicApiKey,
-                    serviceEncryptionKey: serviceEncryptionKey,
-                    blockEmulatorDetection: blockEmulatorDetection,
+                keyri?.easyKeyriAuth(
                     payload: payload,
-                    publicUserId: publicUserId) { didSucceed in
-                    switch didSucceed {
-                    case.failure:
-                        result(false)
-                    case .success(let bool):
-                        result(bool)
+                    publicUserId: publicUserId) { authResult in
+                        switch authResult {
+                        case.failure (let error):
+                            result(error.localizedDescription)
+                        case .success(let boolResult):
+                            result(boolResult)
+                        }
                     }
-                }
+            } else {
+                result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "generateAssociationKey" {
             if let args = call.arguments as? [String: String],
-               let user = args["publicUserId"] {
-                do {
-                    let key = try keyri.generateAssociationKey(username:user).derRepresentation.base64EncodedString
-                    result(key)
-                } catch {
-                    result(error.localizedDescription)
+               let publicUserId = args["publicUserId"] {
+                keyri?.generateAssociationKey(publicUserId:publicUserId) { keyResult in
+                    switch keyResult {
+                    case.failure (let error):
+                        result(error.localizedDescription)
+                    case .success(let key):
+                        result(key.derRepresentation.base64EncodedString)
+                    }
                 }
+            } else {
+                result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "generateUserSignature" {
             if let args = call.arguments as? [String: String],
-               let user = args["publicUserId"],
-               let data = args["data"] {
-                do {
-                    let key = try keyri.generateUserSignature(username:user, data:data).derRepresentation.base64EncodedString
-                    result(key)
-                } catch {
+               let publicUserId = args["publicUserId"],
+               let dataString = args["data"],
+               let data = dataString.data(using: .utf8) {
+                keyri?.generateUserSignature(publicUserId:publicUserId, data:data) { signatureResult in
+                    switch signatureResult {
+                    case.failure (let error):
+                        result(error.localizedDescription)
+                    case .success(let signature):
+                        result(signature.derRepresentation.base64EncodedString)
+                    }
+                }
+            } else {
+                result("failed to parse arguments")
+            }
+        }
+        
+        if call.method == "listAssociationKeys" {
+            keyri?.listAssociactionKeys { keysResult in
+                switch keysResult {
+                case.failure (let error):
                     result(error.localizedDescription)
+                case .success(let keys):
+                    result(keys)
                 }
             }
         }
-
-        if call.method == "listAssociationKeys" {
-            do {
-            // TODO Add mapping
-                let keys = try keyri.listAssociationKeys().derRepresentation.base64EncodedString
-                result(keys)
-            } catch {
-                result(error.localizedDescription)
-            }
-        }
-
+        
         if call.method == "listUniqueAccounts" {
-            do {
-            // TODO Add mapping
-                let keys = try keyri.listUniqueAccounts().derRepresentation.base64EncodedString
-                result(keys)
-            } catch {
-                result(error.localizedDescription)
+            keyri?.listUniqueAccounts { keysResult in
+                switch keysResult {
+                case.failure (let error):
+                    result(error.localizedDescription)
+                case .success(let keys):
+                    result(keys)
+                }
             }
         }
-
+        
         if call.method == "getAssociationKey" {
             if let args = call.arguments as? [String: String],
-               let user = args["publicUserId"] {
-                do {
-                    let key = try keyri.getAssociationKey(username:user).derRepresentation.base64EncodedString
-                    result(key)
-                } catch {
-                    result(error.localizedDescription)
+               let publicUserId = args["publicUserId"] {
+                keyri?.getAssociationKey(publicUserId:publicUserId) { keyResult in
+                    switch keyResult {
+                    case.failure (let error):
+                        result(error.localizedDescription)
+                    case .success(let key):
+                        result(key?.derRepresentation.base64EncodedString)
+                    }
                 }
+            } else {
+                result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "removeAssociationKey" {
-            do {
-                try keyri.removeAssociationKey()
-                result(true)
-            } catch {
-                result(error.localizedDescription)
+            if let args = call.arguments as? [String: String],
+               let publicUserId = args["publicUserId"] {
+                keyri?.removeAssociationKey(publicUserId: publicUserId) { removeResult in
+                    switch removeResult {
+                    case.failure (let error):
+                        result(error.localizedDescription)
+                    case .success:
+                        result(true)
+                    }
+                }
+            } else {
+                result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "sendEvent" {
             if let args = call.arguments as? [String: String],
                let publicUserId = args["publicUserId"],
                let eventType = args["eventType"],
-               let success = args["success"] { // TODO as Boolean
-                keyri.initiateQrSession(publicUserId: publicUserId, eventType: eventType, success: success) { eventResponse in
-                    switch eventResponse {
+               let success = args["success"] {
+                keyri?.sendEvent(publicUserId: publicUserId, eventType: EventType(rawValue: eventType) ?? .visits, success: Bool(success) ?? true) { sessionResult in
+                    switch sessionResult {
                     case .failure(let error):
                         result(error.localizedDescription)
                     case .success(let fingerprintEventResponse):
@@ -140,13 +149,13 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                 result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "initiateQrSession" {
             if let args = call.arguments as? [String: String],
-               let publicUserId = args["publicUserId"],
-               let sessionId = args["sessionId"] {
-                keyri.initiateQrSession(sessionId: sessionId, publicUserId: publicUserId) { returnedSession in
-                    switch returnedSession {
+               let sessionId = args["sessionId"],
+               let publicUserId = args["publicUserId"] {
+                keyri?.initiateQrSession(sessionId: sessionId, publicUserId: publicUserId) { sessionResult in
+                    switch sessionResult {
                     case .failure(let error):
                         result(error.localizedDescription)
                     case .success(let session):
@@ -158,63 +167,79 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                 result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "initializeDefaultConfirmationScreen" {
             if let session = self.activeSession,
                let args = call.arguments as? [String: String],
                let payload = args["payload"] {
-                keyri.initializeDefaultConfirmationScreen(session: session, payload: payload) { bool in
-                    result(bool)
+                keyri?.initializeDefaultConfirmationScreen(session: session, payload: payload) { boolResult in
+                    result(boolResult)
                 }
             } else {
-                result(false)
+                result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "processLink" {
             if let args = call.arguments as? [String: String],
-               let link = args["link"],
+               let linkString = args["link"],
+               let link = URL(string: linkString),
                let payload = args["payload"],
                let publicUserId = args["publicUserId"] {
-                keyri.processLink(link: link, payload: payload, publicUserId: publicUserId) { bool in
-                    result(bool)
+                keyri?.processLink(url: link, payload: payload, publicUserId: publicUserId) { boolResult in
+                    result(boolResult)
                 }
             } else {
-                result(false)
+                result("failed to parse arguments")
             }
         }
-
+        
         if call.method == "confirmSession" {
             if let args = call.arguments as? [String: String],
-               let payload = args["payload"],
-               let trustNewBrowser = args["trustNewBrowser"] { // TODO As Boolean
-                activeSession?.confirm(payload, trustNewBrowser)
-                result(true)
+               let payload = args["payload"] {
+                activeSession?.payload = payload
+                
+                activeSession?.confirm { sessionResult in
+                    switch sessionResult {
+                    case .some(let error):
+                        result(error.localizedDescription)
+                    case .none:
+                        result(true)
+                    }
+                }
             } else {
-                result(false)
+                result("failed to parse arguments")
             }
         }
         
         if call.method == "denySession" {
             if let args = call.arguments as? [String: String],
-               let payload = args["payload"] { // TODO As Boolean
-                activeSession?.deny(payload)
-                result(true)
+               let payload = args["payload"] {
+                activeSession?.payload = payload
+                
+                activeSession?.deny { sessionResult in
+                    switch sessionResult {
+                    case .some(let error):
+                        result(error.localizedDescription)
+                    case .none:
+                        result(true)
+                    }
+                }
             } else {
-                result(false)
+                result("failed to parse arguments")
             }
         }
     }
 }
 
 extension Encodable {
-  func asDictionary() -> [String: Any]? {
-      guard let data = try? JSONEncoder().encode(self) else {
-          return nil
-      }
-    guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else {
-      return nil
+    func asDictionary() -> [String: Any]? {
+        guard let data = try? JSONEncoder().encode(self) else {
+            return nil
+        }
+        guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else {
+            return nil
+        }
+        return dictionary
     }
-    return dictionary
-  }
 }
