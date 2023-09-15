@@ -15,11 +15,11 @@ class MethodChannelKeyri extends KeyriPlatform {
   @override
   Future<bool> initialize(String appKey, String? publicApiKey,
       String? serviceEncryptionKey, bool? blockEmulatorDetection) async {
-    return await methodChannel.invokeMethod<bool>('initialize', {
+    return await methodChannel.invokeMethod<bool?>('initialize', {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
-          'blockEmulatorDetection': blockEmulatorDetection.toString()
+          'blockEmulatorDetection': blockEmulatorDetection
         }) ??
         false;
   }
@@ -32,7 +32,7 @@ class MethodChannelKeyri extends KeyriPlatform {
       bool? blockEmulatorDetection,
       String payload,
       String? publicUserId) async {
-    return await methodChannel.invokeMethod<bool>('easyKeyriAuth', {
+    return await methodChannel.invokeMethod<bool?>('easyKeyriAuth', {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
@@ -101,7 +101,7 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<FingerprintEventResponse> sendEvent(
+  Future<FingerprintEventResponse?> sendEvent(
       String? publicUserId, EventType eventType, bool success) async {
     dynamic fingerprintEventResponseObject =
         await methodChannel.invokeMethod<dynamic>('sendEvent', {
@@ -114,7 +114,7 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<Session> initiateQrSession(
+  Future<Session?> initiateQrSession(
       String sessionId, String? publicUserId) async {
     dynamic sessionObject = await methodChannel.invokeMethod<dynamic>(
         'initiateQrSession',

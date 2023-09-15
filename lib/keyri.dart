@@ -25,13 +25,7 @@ class Keyri {
             });
   }
 
-  Future<bool?> easyKeyriAuth(
-      String appKey,
-      String? publicApiKey,
-      String? serviceEncryptionKey,
-      bool? blockEmulatorDetection,
-      String payload,
-      String? publicUserId) {
+  Future<bool?> easyKeyriAuth(String payload, String? publicUserId) {
     return KeyriPlatform.instance.easyKeyriAuth(appKey, publicApiKey,
         serviceEncryptionKey, blockEmulatorDetection, payload, publicUserId);
   }
@@ -60,7 +54,7 @@ class Keyri {
     return KeyriPlatform.instance.removeAssociationKey(publicUserId);
   }
 
-  Future<FingerprintEventResponse> sendEvent(
+  Future<FingerprintEventResponse?> sendEvent(
       String? publicUserId, EventType eventType, bool success) {
     return KeyriPlatform.instance.sendEvent(publicUserId, eventType, success);
   }
