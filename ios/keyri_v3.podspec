@@ -1,11 +1,10 @@
 require 'yaml'
 
 pubspec = YAML.load_file(File.join('..', 'pubspec.yaml'))
-library_version = pubspec['version'].gsub('+', '-')
 
 Pod::Spec.new do |s|
   s.name             = pubspec['name']
-  s.version          = library_version
+  s.version          = pubspec['version']
   s.summary          = 'Keyri Flutter plugin.'
   s.description      = pubspec['description']
   s.homepage         = pubspec['homepage']
@@ -14,8 +13,9 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
 
   s.source_files = 'Classes/**/*'
+  s.public_header_files = 'Classes/**/*.h'
 
-  s.ios.deployment_target = '14.0'
+  s.platform = :ios, '14.0'
   s.dependency 'Flutter'
 
   s.dependency 'keyri-pod'

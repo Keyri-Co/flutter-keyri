@@ -18,4 +18,4 @@ migration:
 
   unmanaged_files:
     - 'lib/main.dart'
-    - 'ios/KeyriExample.xcodeproj/project.pbxproj'
+    - 'ios/Runner.xcodeproj/project.pbxproj'

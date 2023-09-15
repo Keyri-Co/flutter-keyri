@@ -105,7 +105,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   Keyri keyri = Keyri(appKey, publicApiKey, serviceEncryptionKey, true);
 
   void onMobileScannerDetect(BarcodeCapture barcodes) {
-    if (barcodes.barcodes.isNotEmpty) {
+    if (barcodes.barcodes.isNotEmpty && !_isLoading) {
       var barcode = barcodes.barcodes[0];
 
       if (barcode.rawValue == null) {
@@ -164,8 +164,10 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
 
-    setState(() {
-      _isLoading = false;
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 

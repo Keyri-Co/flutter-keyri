@@ -20,8 +20,10 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                let serviceEncryptionKey = args["serviceEncryptionKey"],
                let blockEmulatorDetection = args["blockEmulatorDetection"] {
                 keyri = KeyriInterface(appKey: appKey, publicApiKey: publicApiKey, serviceEncryptionKey: serviceEncryptionKey, blockEmulatorDetection: Bool(blockEmulatorDetection))
+                
+                result(true)
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -40,7 +42,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                         }
                     }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -56,7 +58,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -74,7 +76,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -112,7 +114,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -128,7 +130,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -146,7 +148,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -164,7 +166,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -176,7 +178,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     result(boolResult)
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -190,7 +192,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     result(boolResult)
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -208,7 +210,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
         
@@ -226,7 +228,7 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
                     }
                 }
             } else {
-                result("failed to parse arguments")
+                result("Failed to parse arguments")
             }
         }
     }

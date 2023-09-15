@@ -54,7 +54,7 @@ class Keyri {
     return KeyriPlatform.instance.removeAssociationKey(publicUserId);
   }
 
-  Future<FingerprintEventResponse> sendEvent(
+  Future<FingerprintEventResponse?> sendEvent(
       String? publicUserId, EventType eventType, bool success) {
     return KeyriPlatform.instance.sendEvent(publicUserId, eventType, success);
   }
