@@ -13,3 +13,10 @@
 ## 1.3.0
 
 - Updated Keyri Android and iOS SDKs to latest.
+
+## 1.4.0
+
+- Added docs.
+- Updated Android SDK to 4.0.0 version.
+- Refactored Keyri methods types, removed redundant nullable values.
+- Hide channel interface code.
