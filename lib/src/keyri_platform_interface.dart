@@ -31,7 +31,7 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('initialize() has not been implemented.');
   }
 
-  Future<bool?> easyKeyriAuth(
+  Future<bool> easyKeyriAuth(
       String appKey,
       String? publicApiKey,
       String? serviceEncryptionKey,
@@ -68,7 +68,7 @@ abstract class KeyriPlatform extends PlatformInterface {
         'removeAssociationKey() has not been implemented.');
   }
 
-  Future<FingerprintEventResponse> sendEvent(
+  Future<FingerprintEventResponse?> sendEvent(
       String? publicUserId, EventType eventType, bool success) {
     throw UnimplementedError('sendEvent() has not been implemented.');
   }

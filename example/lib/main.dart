@@ -104,25 +104,30 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
 
   Keyri keyri = Keyri(appKey, publicApiKey: publicApiKey, serviceEncryptionKey: serviceEncryptionKey, blockEmulatorDetection: true);
 
-  void onMobileScannerDetect(Barcode barcode, MobileScannerArguments? args) {
-    if (barcode.rawValue == null) {
-      debugPrint('Failed to scan Barcode');
-      return;
+  void onMobileScannerDetect(BarcodeCapture barcodes) {
+    if (barcodes.barcodes.isNotEmpty && !_isLoading) {
+      var barcode = barcodes.barcodes[0];
+
+      if (barcode.rawValue == null) {
+        debugPrint('Failed to scan Barcode');
+        return;
+      }
+
+      final String? code = barcode.rawValue;
+      debugPrint('Scanned barcode: $code');
+
+      if (code == null) return;
+
+      var sessionId = Uri.dataFromString(code).queryParameters['sessionId'];
+
+      if (sessionId == null) return;
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      _onReadSessionId(sessionId);
     }
-
-    final String? code = barcode.rawValue;
-    debugPrint('Scanned barcode: $code');
-
-    if (code == null) return;
-
-    var sessionId = Uri.dataFromString(code).queryParameters['sessionId'];
-
-    if (sessionId == null) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-    _onReadSessionId(sessionId);
   }
 
   @override
@@ -138,8 +143,7 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [CircularProgressIndicator()]))
-                : MobileScanner(
-                    allowDuplicates: false, onDetect: onMobileScannerDetect),
+                : MobileScanner(onDetect: onMobileScannerDetect),
           )
         ],
       ),
@@ -160,8 +164,10 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
 
-    setState(() {
-      _isLoading = false;
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 

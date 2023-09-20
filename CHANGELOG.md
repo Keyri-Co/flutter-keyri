@@ -9,3 +9,7 @@
 ## 1.2.0
 
 - Updated Keyri Android SDK, added fraud events.
+
+## 1.3.0
+
+- Updated Keyri Android and iOS SDKs to latest.
