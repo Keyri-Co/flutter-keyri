@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 class FingerprintEventResponse {
-  FingerprintEventResponse(
-      this.apiCiphertextSignature, this.publicEncryptionKey, this.ciphertext, this.iv, this.salt);
+  FingerprintEventResponse(this.apiCiphertextSignature,
+      this.publicEncryptionKey, this.ciphertext, this.iv, this.salt);
 
   final String apiCiphertextSignature;
   final String publicEncryptionKey;
