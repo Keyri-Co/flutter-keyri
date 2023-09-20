@@ -39,7 +39,7 @@ class Keyri {
   }
 
   /// Call this method to launch in-app scanner and delegate authentication to SDK.
-  Future<bool?> easyKeyriAuth(String payload, {String? publicUserId}) {
+  Future<bool> easyKeyriAuth(String payload, {String? publicUserId}) {
     return KeyriPlatform.instance.easyKeyriAuth(_appKey, _publicApiKey,
         _serviceEncryptionKey, _blockEmulatorDetection, payload, publicUserId);
   }
@@ -87,7 +87,7 @@ class Keyri {
 
   /// Call it after obtaining the sessionId from QR code or deep link.
   /// Returns Future of [Session] object with Risk attributes (needed to show confirmation screen) or error.
-  Future<Session?> initiateQrSession(String sessionId, {String? publicUserId}) {
+  Future<Session> initiateQrSession(String sessionId, {String? publicUserId}) {
     return KeyriPlatform.instance.initiateQrSession(sessionId, publicUserId);
   }
 

@@ -68,12 +68,12 @@ abstract class KeyriPlatform extends PlatformInterface {
         'removeAssociationKey() has not been implemented.');
   }
 
-  Future<FingerprintEventResponse?> sendEvent(
+  Future<FingerprintEventResponse> sendEvent(
       String? publicUserId, EventType eventType, bool success) {
     throw UnimplementedError('sendEvent() has not been implemented.');
   }
 
-  Future<Session?> initiateQrSession(String sessionId, String? publicUserId) {
+  Future<Session> initiateQrSession(String sessionId, String? publicUserId) {
     throw UnimplementedError('initiateQrSession() has not been implemented.');
   }
 
