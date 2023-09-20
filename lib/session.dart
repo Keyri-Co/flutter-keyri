@@ -22,6 +22,7 @@ class Session {
   final String? publicUserId;
   final MobileTemplateResponse? mobileTemplateResponse;
 
+  /// Conversion helper method.
   static Session fromJson(dynamic json) {
     dynamic jsonData = json;
 
@@ -79,6 +80,7 @@ class WidgetUserAgent {
   final String os;
   final String browser;
 
+  /// Conversion helper method.
   static WidgetUserAgent fromJson(dynamic json) {
     return WidgetUserAgent(
       json['os'] as String,
@@ -92,6 +94,7 @@ class UserParameters {
 
   final String? base64EncodedData;
 
+  /// Conversion helper method.
   static UserParameters fromJson(dynamic json) {
     return UserParameters(json['base64EncodedData'] as String?);
   }
@@ -104,6 +107,7 @@ class RiskAnalytics {
   final String? riskFlagString;
   final GeoData? geoData;
 
+  /// Conversion helper method.
   static RiskAnalytics fromJson(dynamic json) {
     var geoDataJson = json['geoData'];
     GeoData? geoData;
@@ -123,6 +127,7 @@ class GeoData {
   final IPData? mobile;
   final IPData? browser;
 
+  /// Conversion helper method.
   static GeoData fromJson(dynamic json) {
     var mobileJson = json['mobile'];
     var browserJson = json['browser'];
@@ -153,6 +158,7 @@ class IPData {
   final double? longitude;
   final String? regionCode;
 
+  /// Conversion helper method.
   static IPData fromJson(dynamic json) {
     return IPData(
         json['continentCode'] as String?,
@@ -175,6 +181,7 @@ class MobileTemplateResponse {
   final UserAgent? userAgent;
   final Flags? flags;
 
+  /// Conversion helper method.
   static MobileTemplateResponse fromJson(dynamic json) {
     var widgetJson = json['widget'];
     var mobileJson = json['mobile'];
@@ -202,6 +209,7 @@ class MobileTemplateResponse {
       flags = Flags.fromJson(flagsJson);
     }
 
+    /// Conversion helper method.
     return MobileTemplateResponse(json['title'] as String?,
         json['message'] as String?, widget, mobile, userAgent, flags);
   }
@@ -213,6 +221,7 @@ class Template {
   final String? location;
   final String? issue;
 
+  /// Conversion helper method.
   static Template fromJson(dynamic json) {
     return Template(json['location'] as String?, json['issue'] as String?);
   }
@@ -224,6 +233,7 @@ class UserAgent {
   final String? name;
   final String? issue;
 
+  /// Conversion helper method.
   static UserAgent fromJson(dynamic json) {
     return UserAgent(json['name'] as String?, json['issue'] as String?);
   }
@@ -235,6 +245,7 @@ class Flags {
   final bool? isDatacenter;
   final bool? isNewBrowser;
 
+  /// Conversion helper method.
   static Flags fromJson(dynamic json) {
     return Flags(json['isDatacenter'] as bool?, json['isNewBrowser'] as bool?);
   }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+/// Class which represents fingerprint event object.
 class FingerprintEventResponse {
   FingerprintEventResponse(this.apiCiphertextSignature,
       this.publicEncryptionKey, this.ciphertext, this.iv, this.salt);
@@ -10,6 +11,7 @@ class FingerprintEventResponse {
   final String iv;
   final String salt;
 
+  /// Conversion helper method.
   static FingerprintEventResponse fromJson(dynamic json) {
     dynamic jsonData = json;
 
