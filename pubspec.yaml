@@ -1,6 +1,6 @@
 name: keyri_v3
-description: Keyri QR Login plugin for Flutter.
-version: 1.3.0
+description: Keyri QR Login plugin for Flutter. Provides Keyri SDK capabilities for secure and passwordless login.
+version: 1.4.0
 homepage: https://keyri.com
 
 environment:

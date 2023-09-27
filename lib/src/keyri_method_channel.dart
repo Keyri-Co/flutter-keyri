@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:keyri_v3/fingerprint_event_response.dart';
 import 'package:keyri_v3/session.dart';
 
-import 'keyri_fingerprint_event.dart';
+import '../keyri_fingerprint_event.dart';
 import 'keyri_platform_interface.dart';
 
 /// An implementation of [KeyriPlatform] that uses method channels.
@@ -15,7 +15,7 @@ class MethodChannelKeyri extends KeyriPlatform {
   @override
   Future<bool> initialize(String appKey, String? publicApiKey,
       String? serviceEncryptionKey, bool? blockEmulatorDetection) async {
-    return await methodChannel.invokeMethod<bool?>('initialize', {
+    return await methodChannel.invokeMethod<bool>('initialize', {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
@@ -32,7 +32,7 @@ class MethodChannelKeyri extends KeyriPlatform {
       bool? blockEmulatorDetection,
       String payload,
       String? publicUserId) async {
-    return await methodChannel.invokeMethod<bool?>('easyKeyriAuth', {
+    return await methodChannel.invokeMethod<bool>('easyKeyriAuth', {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
@@ -45,14 +45,14 @@ class MethodChannelKeyri extends KeyriPlatform {
 
   @override
   Future<String?> generateAssociationKey(String? publicUserId) async {
-    return await methodChannel.invokeMethod<String?>(
+    return await methodChannel.invokeMethod<String>(
         'generateAssociationKey', {'publicUserId': publicUserId});
   }
 
   @override
   Future<String?> generateUserSignature(
       String? publicUserId, String data) async {
-    return await methodChannel.invokeMethod<String?>(
+    return await methodChannel.invokeMethod<String>(
         'generateUserSignature', {'publicUserId': publicUserId, 'data': data});
   }
 
@@ -101,7 +101,7 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<FingerprintEventResponse?> sendEvent(
+  Future<FingerprintEventResponse> sendEvent(
       String? publicUserId, EventType eventType, bool success) async {
     dynamic fingerprintEventResponseObject =
         await methodChannel.invokeMethod<dynamic>('sendEvent', {
@@ -114,7 +114,7 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
-  Future<Session?> initiateQrSession(
+  Future<Session> initiateQrSession(
       String sessionId, String? publicUserId) async {
     dynamic sessionObject = await methodChannel.invokeMethod<dynamic>(
         'initiateQrSession',
