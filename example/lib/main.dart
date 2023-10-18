@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:keyri_v3/keyri.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -34,7 +35,10 @@ class KeyriHomePage extends StatefulWidget {
 }
 
 class _KeyriHomePageState extends State<KeyriHomePage> {
-  Keyri keyri = Keyri(appKey, publicApiKey: publicApiKey, serviceEncryptionKey: serviceEncryptionKey, blockEmulatorDetection: true);
+  Keyri keyri = Keyri(appKey,
+      publicApiKey: publicApiKey,
+      serviceEncryptionKey: serviceEncryptionKey,
+      blockEmulatorDetection: true);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
     keyri
         .easyKeyriAuth('Some payload', publicUserId: publicUserId)
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
-        .catchError((error, stackTrace) => _onError(error));
+        .catchError((error, stackTrace) => _processError(error));
   }
 
   void _customUI() {
@@ -64,9 +68,14 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
         MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
   }
 
-  void _onError(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+  void _processError(dynamic error) {
+    if (error is PlatformException) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message ?? "Error occurred")));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   void _onAuthResult(bool result) {
@@ -102,7 +111,10 @@ class KeyriScannerAuthPage extends StatefulWidget {
 class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   bool _isLoading = false;
 
-  Keyri keyri = Keyri(appKey, publicApiKey: publicApiKey, serviceEncryptionKey: serviceEncryptionKey, blockEmulatorDetection: true);
+  Keyri keyri = Keyri(appKey,
+      publicApiKey: publicApiKey,
+      serviceEncryptionKey: serviceEncryptionKey,
+      blockEmulatorDetection: true);
 
   void onMobileScannerDetect(BarcodeCapture barcodes) {
     if (barcodes.barcodes.isNotEmpty && !_isLoading) {

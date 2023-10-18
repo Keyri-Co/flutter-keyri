@@ -34,7 +34,7 @@ class Keyri {
             _blockEmulatorDetection)
         .then((isInitialized) => {
               if (!isInitialized)
-                {throw Exception('You need to specify appKey')}
+                {throw Exception('Failed to initialize Keyri')}
             });
   }
 

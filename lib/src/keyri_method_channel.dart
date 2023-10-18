@@ -19,7 +19,7 @@ class MethodChannelKeyri extends KeyriPlatform {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
-          'blockEmulatorDetection': blockEmulatorDetection
+          'blockEmulatorDetection': (blockEmulatorDetection ?? true).toString()
         }) ??
         false;
   }
@@ -36,7 +36,7 @@ class MethodChannelKeyri extends KeyriPlatform {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
-          'blockEmulatorDetection': blockEmulatorDetection.toString(),
+          'blockEmulatorDetection': (blockEmulatorDetection ?? true).toString(),
           'payload': payload,
           'publicUserId': publicUserId
         }) ??

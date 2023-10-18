@@ -20,3 +20,10 @@
 - Updated Android SDK to 4.0.0 version.
 - Refactored Keyri methods types, removed redundant nullable values.
 - Hide channel interface code.
+
+## 1.4.1
+
+- Updated Android SDK to [4.0.2](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.0.2)
+- Updated iOS SDK to [4.2.5](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.2.5)
+- Improved iOS error handling
+- Fixed channel types
