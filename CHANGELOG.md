@@ -27,3 +27,7 @@
 - Updated iOS SDK to [4.2.5](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.2.5)
 - Improved iOS error handling
 - Fixed channel types
+
+## 1.4.2
+
+- Added constraints to Android and iOS SDK-s.
