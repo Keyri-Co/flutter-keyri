@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keyri_v3/keyri.dart';
+import 'package:keyri_v3/keyri_fingerprint_event.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 void main() {
@@ -49,17 +52,85 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             button(_easyKeyriAuth, 'Easy Keyri Auth'),
-            button(_customUI, 'Custom UI')
+            button(_customUI, 'Custom UI'),
+            button(_sendEvent, 'Send event'),
+            button(_generateAssociationKey, 'Generate association key'),
+            button(_getAssociationKey, 'Get association key'),
+            button(_removeAssociationKey, 'Remove association key'),
+            button(_listAssociationKeys, 'List association keys'),
+            button(_listUniqueAccounts, 'List unique accounts'),
+            button(_generateSignature, 'Generate signature')
           ],
         ),
       ),
     );
   }
 
+  void _generateAssociationKey() {
+    keyri
+        .generateAssociationKey(publicUserId: publicUserId)
+        .then((key) => _showMessage('Key generated: $key'))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
+  void _getAssociationKey() {
+    keyri
+        .getAssociationKey(publicUserId: publicUserId)
+        .then((key) => _showMessage('Key: $key'))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
+  void _generateSignature() {
+    int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    keyri
+        .generateUserSignature(
+            publicUserId: publicUserId, data: timestamp.toString())
+        .then((signature) => _showMessage('Signature: $signature'))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
+  void _removeAssociationKey() {
+    String? userId = publicUserId;
+
+    if (userId != null) {
+      keyri
+          .removeAssociationKey(userId)
+          .then((_) => _showMessage('Key removed'))
+          .catchError((error, stackTrace) => _processError(error));
+    } else {
+      _showMessage('publicUserId shouldn\'t be null');
+    }
+  }
+
+  void _listAssociationKeys() {
+    keyri
+        .listAssociationKeys()
+        .then((keys) => _showMessage(json.encode(keys)))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
+  void _listUniqueAccounts() {
+    keyri
+        .listUniqueAccounts()
+        .then((keys) => _showMessage(json.encode(keys)))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
   void _easyKeyriAuth() {
     keyri
         .easyKeyriAuth('Some payload', publicUserId: publicUserId)
         .then((authResult) => _onAuthResult(authResult == true ? true : false))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
+  void _sendEvent() {
+    keyri
+        .sendEvent(
+            publicUserId: publicUserId,
+            eventType: EventType.visits,
+            success: true)
+        .then((fingerprintEventResponse) => _showMessage("Event sent"))
         .catchError((error, stackTrace) => _processError(error));
   }
 
@@ -70,23 +141,23 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
   void _processError(dynamic error) {
     if (error is PlatformException) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message ?? "Error occurred")));
+      _showMessage(error.message ?? "Error occurred");
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error.toString())));
+      _showMessage(error.toString());
     }
   }
 
   void _onAuthResult(bool result) {
-    String text;
     if (result) {
-      text = 'Successfully authenticated!';
+      _showMessage('Successfully authenticated!');
     } else {
-      text = 'Authentication failed';
+      _showMessage('Authentication failed');
     }
+  }
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget button(VoidCallback onPressedCallback, String text) {
@@ -184,17 +255,19 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   }
 
   void _onAuthResult(bool result) {
-    var successfullyAuthenticatedText = 'Successfully authenticated!';
-
-    if (!result) {
-      successfullyAuthenticatedText = 'Failed to authenticate';
+    if (result) {
+      _showMessage('Successfully authenticated!');
+    } else {
+      _showMessage('Authentication failed');
     }
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(successfullyAuthenticatedText)));
 
     setState(() {
       _isLoading = false;
     });
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 }

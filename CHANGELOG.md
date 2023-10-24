@@ -1,25 +1,17 @@
-## 0.1.0
-
-- Updating Readme.md and pubspec.yaml
-
-## 0.0.1
-
-- Initial release.
-
 ## 1.2.0
 
-- Updated Keyri Android SDK, added fraud events.
+- Updated Keyri Android SDK, added fraud events
 
 ## 1.3.0
 
-- Updated Keyri Android and iOS SDKs to latest.
+- Updated Keyri Android and iOS SDKs to latest
 
 ## 1.4.0
 
-- Added docs.
-- Updated Android SDK to 4.0.0 version.
-- Refactored Keyri methods types, removed redundant nullable values.
-- Hide channel interface code.
+- Added docs
+- Updated Android SDK to 4.0.0 version
+- Refactored Keyri methods types, removed redundant nullable values
+- Hide channel interface code
 
 ## 1.4.1
 
@@ -30,8 +22,13 @@
 
 ## 1.4.2
 
-- Added constraints to Android and iOS SDK-s.
+- Added constraints to Android and iOS SDK-s
 
 ## 1.4.3
 
-- Fixed parsing publicUserId argument on iOS.
+- Fixed parsing publicUserId argument on iOS
+
+## 1.4.4
+
+- Updated handling arguments on Android and iOS bridges
+- Extended example app

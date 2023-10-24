@@ -113,7 +113,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             "sendEvent" -> {
                 val publicUserId = arguments?.get("publicUserId")
                 val eventType = arguments?.get("eventType")
-                val success = arguments?.get("success")?.toBoolean() ?: true
+                val success = arguments?.get("success")?.toBoolean()
 
                 sendEvent(publicUserId, eventType, success, result)
             }
@@ -299,13 +299,15 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     private fun sendEvent(
         publicUserId: String?,
         eventType: String?,
-        success: Boolean,
+        success: Boolean?,
         result: MethodChannel.Result
     ) {
         keyriCoroutineScope("sendEvent", result::error).launch {
             val type = EventType.values().firstOrNull { it.type == eventType }
 
-            if (type == null) {
+            if (success == null) {
+                result.error("sendEvent", "success must not be null", null)
+            } else if (type == null) {
                 result.error("sendEvent", "eventType must not be null", null)
             } else {
                 val userId = if (publicUserId == null) "ANON" else publicUserId
