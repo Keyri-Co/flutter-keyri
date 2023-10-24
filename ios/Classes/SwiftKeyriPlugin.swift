@@ -133,17 +133,17 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
         
         if call.method == "sendEvent" {
             if let args = call.arguments as? [String: Any],
-               let publicUserId = args["publicUserId"] as? String,
                let eventType = args["eventType"] as? String,
                let success = args["success"] as? String {
-                keyri?.sendEvent(publicUserId: publicUserId, eventType: EventType(rawValue: eventType) ?? .visits, success: Bool(success) ?? true) { sessionResult in
-                    switch sessionResult {
-                    case .failure(let error):
-                        self.errorResult(error: error, result: result)
-                    case .success(let fingerprintEventResponse):
-                        result(fingerprintEventResponse.asDictionary())
-                    }
-                }
+               // TODO: Refactor as default arg
+               keyri?.sendEvent(publicUserId: args["publicUserId"] as? String ?? "ANON", eventType: EventType(rawValue: eventType) ?? .visits, success: Bool(success) ?? true) { sessionResult in
+                   switch sessionResult {
+                   case .failure(let error):
+                       self.errorResult(error: error, result: result)
+                   case .success(let fingerprintEventResponse):
+                       result(fingerprintEventResponse.asDictionary())
+                   }
+               }
             } else {
                 errorArgumentsResult(result: result)
             }

@@ -31,3 +31,7 @@
 ## 1.4.2
 
 - Added constraints to Android and iOS SDK-s.
+
+## 1.4.3
+
+- Fixed parsing publicUserId argument on iOS.
