@@ -2,6 +2,7 @@ package com.keyrico.keyri
 
 import androidx.annotation.NonNull
 import android.net.Uri
+import android.util.Log
 import android.app.Activity
 import android.content.Intent
 import com.google.gson.Gson
@@ -54,6 +55,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val blockEmulatorDetection =
                     arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
 
+                logMessage("Keyri: initialize called")
                 initialize(
                     appKey,
                     publicApiKey,
@@ -72,6 +74,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val payload = arguments?.get("payload")
                 val publicUserId = arguments?.get("publicUserId")
 
+                logMessage("Keyri: easyKeyriAuth called")
                 easyKeyriAuth(
                     appKey,
                     publicApiKey,
@@ -86,6 +89,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             "generateAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
 
+                logMessage("Keyri: generateAssociationKey called")
                 generateAssociationKey(publicUserId, result)
             }
 
@@ -93,20 +97,31 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val publicUserId = arguments?.get("publicUserId")
                 val data = arguments?.get("data")
 
+                logMessage("Keyri: generateUserSignature called")
                 generateUserSignature(publicUserId, data, result)
             }
 
-            "listAssociationKeys" -> listAssociationKeys(result)
-            "listUniqueAccounts" -> listUniqueAccounts(result)
+            "listAssociationKeys" -> {
+                logMessage("Keyri: listAssociationKeys called")
+                listAssociationKeys(result)
+            }
+
+            "listUniqueAccounts" -> {
+                logMessage("Keyri: listUniqueAccounts called")
+                listUniqueAccounts(result)
+            }
+
             "getAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
 
+                logMessage("Keyri: getAssociationKey called")
                 getAssociationKey(publicUserId, result)
             }
 
             "removeAssociationKey" -> {
                 val publicUserId = arguments?.get("publicUserId")
 
+                logMessage("Keyri: removeAssociationKey called")
                 removeAssociationKey(publicUserId, result)
             }
 
@@ -115,6 +130,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val eventType = arguments?.get("eventType")
                 val success = arguments?.get("success")?.toBoolean()
 
+                logMessage("Keyri: sendEvent called")
                 sendEvent(publicUserId, eventType, success, result)
             }
 
@@ -122,19 +138,21 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val sessionId = arguments?.get("sessionId")
                 val publicUserId = arguments?.get("publicUserId")
 
+                logMessage("Keyri: initiateQrSession called")
                 initiateQrSession(sessionId, publicUserId, result)
             }
 
-            "initializeDefaultConfirmationScreen" -> initializeDefaultConfirmationScreen(
-                arguments?.get("payload"),
-                result
-            )
+            "initializeDefaultConfirmationScreen" -> {
+                logMessage("Keyri: initializeDefaultConfirmationScreen called")
+                initializeDefaultConfirmationScreen(arguments?.get("payload"), result)
+            }
 
             "processLink" -> {
                 val link = arguments?.get("link")
                 val payload = arguments?.get("payload")
                 val publicUserId = arguments?.get("publicUserId")
 
+                logMessage("Keyri: processLink called")
                 processLink(link, payload, publicUserId, result)
             }
 
@@ -142,10 +160,15 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val payload = arguments?.get("payload")
                 val trustNewBrowser = arguments?.get("trustNewBrowser")?.toBoolean() ?: false
 
+                logMessage("Keyri: confirmSession called")
                 confirmSession(payload, trustNewBrowser, result)
             }
 
-            "denySession" -> denySession(arguments?.get("payload"), result)
+            "denySession" -> {
+                logMessage("Keyri: confirmSession called")
+                denySession(arguments?.get("payload"), result)
+            }
+
             else -> result.notImplemented()
         }
     }
@@ -166,6 +189,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == AUTH_REQUEST_CODE) {
+            logMessage("Keyri easyKeyriAuth success")
             easyKeyriAuthResult?.success(resultCode == Activity.RESULT_OK)
         }
 
@@ -184,6 +208,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         result: MethodChannel.Result
     ) {
         if (appKey == null) {
+            logMessage("Keyri initialized: appKey must not be null")
             result.error("initialize", "appKey must not be null", null)
         } else {
             activity?.let {
@@ -197,6 +222,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     )
                 }
 
+                logMessage("Keyri initialized")
                 result.success(true)
             }
         }
@@ -211,8 +237,12 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         publicUserId: String?,
         result: MethodChannel.Result
     ) {
-        if (appKey == null || payload == null) {
-            result.error("easyKeyriAuth", "appKey and payload must not be null", null)
+        if (appKey == null) {
+            logMessage("Keyri easyKeyriAuth: appKey must not be null")
+            result.error("easyKeyriAuth", "appKey must not be null", null)
+        } else if (payload == null) {
+            logMessage("Keyri easyKeyriAuth: payload must not be null")
+            result.error("easyKeyriAuth", "payload must not be null", null)
         } else {
             activity?.let {
                 easyKeyriAuth(
@@ -227,11 +257,13 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 )
 
                 easyKeyriAuthResult = result
-            } ?: result.error(
-                "easyKeyriAuth",
-                "To Use this method, make sure your host Activity extended from FlutterFragmentActivity",
-                null
-            )
+            } ?: let {
+                val message =
+                    "To Use this method, make sure your host Activity extended from FlutterFragmentActivity"
+
+                logMessage("Keyri easyKeyriAuth: $message")
+                result.error("easyKeyriAuth", message, null)
+            }
         }
     }
 
@@ -241,6 +273,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 keyri.generateAssociationKey(publicUserId).getOrThrow()
             } ?: keyri.generateAssociationKey().getOrThrow()
 
+            logMessage("Keyri key generated: $associationKey")
             result.success(associationKey)
         }
     }
@@ -252,12 +285,14 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     ) {
         keyriCoroutineScope("generateUserSignature", result::error).launch {
             if (data == null) {
+                logMessage("Keyri generateUserSignature: data must not be null")
                 result.error("generateUserSignature", "data must not be null", null)
             } else {
                 val userSignature = publicUserId?.let {
                     keyri.generateUserSignature(it, data).getOrThrow()
                 } ?: keyri.generateUserSignature(data = data).getOrThrow()
 
+                logMessage("Keyri signature generated: $userSignature")
                 result.success(userSignature)
             }
         }
@@ -265,13 +300,19 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     private fun listAssociationKeys(result: MethodChannel.Result) {
         keyriCoroutineScope("listAssociationKeys", result::error).launch {
-            result.success(keyri.listAssociationKeys().getOrThrow())
+            val keys = keyri.listAssociationKeys().getOrThrow()
+
+            logMessage("Keyri listAssociationKeys: ${keys.size} keys")
+            result.success(keys)
         }
     }
 
     private fun listUniqueAccounts(result: MethodChannel.Result) {
         keyriCoroutineScope("listUniqueAccounts", result::error).launch {
-            result.success(keyri.listUniqueAccounts().getOrThrow())
+            val keys = keyri.listUniqueAccounts().getOrThrow()
+
+            logMessage("Keyri listUniqueAccounts: ${keys.size} keys")
+            result.success(keys)
         }
     }
 
@@ -281,6 +322,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 keyri.getAssociationKey(publicUserId).getOrThrow()
             } ?: keyri.getAssociationKey().getOrThrow()
 
+            logMessage("Keyri getAssociationKey: $associationKey")
             result.success(associationKey)
         }
     }
@@ -288,9 +330,11 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     private fun removeAssociationKey(publicUserId: String?, result: MethodChannel.Result) {
         keyriCoroutineScope("removeAssociationKey", result::error).launch {
             if (publicUserId == null) {
+                logMessage("Keyri removeAssociationKey: publicUserId must not be null")
                 result.error("removeAssociationKey", "publicUserId must not be null", null)
             } else {
                 keyri.removeAssociationKey(publicUserId)
+                logMessage("Keyri removeAssociationKey: success")
                 result.success(true)
             }
         }
@@ -306,15 +350,21 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             val type = EventType.values().firstOrNull { it.type == eventType }
 
             if (success == null) {
+                logMessage("Keyri sendEvent: success must not be null")
                 result.error("sendEvent", "success must not be null", null)
             } else if (type == null) {
+                logMessage("Keyri sendEvent: eventType must not be null")
                 result.error("sendEvent", "eventType must not be null", null)
             } else {
                 val userId = if (publicUserId == null) "ANON" else publicUserId
 
                 keyri.sendEvent(userId, type, success).onSuccess { eventResponse ->
-                    result.success(Gson().toJson(eventResponse))
+                    val eventResponse = Gson().toJson(eventResponse)
+
+                    logMessage("Keyri sendEvent: $eventResponse")
+                    result.success(eventResponse)
                 }.onFailure {
+                    logMessage("Keyri sendEvent: ${it.message}")
                     result.error("sendEvent", it.message, null)
                 }
             }
@@ -328,13 +378,18 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     ) {
         keyriCoroutineScope("initiateQrSession", result::error).launch {
             if (sessionId == null) {
+                logMessage("Keyri initiateQrSession: sessionId must not be null")
                 result.error("initiateQrSession", "sessionId must not be null", null)
             } else {
                 keyri.initiateQrSession(sessionId, publicUserId).onSuccess { session ->
                     activeSession = session
 
-                    result.success(Gson().toJson(session))
+                    val sessionResponse = Gson().toJson(session)
+
+                    logMessage("Keyri initiateQrSession: $sessionResponse")
+                    result.success(sessionResponse)
                 }.onFailure {
+                    logMessage("Keyri initiateQrSession: ${it.message}")
                     result.error("initiateQrSession", it.message, null)
                 }
             }
@@ -347,8 +402,10 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     ) {
         keyriCoroutineScope("initializeDefaultConfirmationScreen", result::error).launch {
             if (activeSession == null) {
+                logMessage("Keyri initializeDefaultConfirmationScreen: can't find session")
                 result.error("initializeDefaultConfirmationScreen", "Can't find session", null)
             } else if (payload == null) {
+                logMessage("Keyri initializeDefaultConfirmationScreen: payload must not be null")
                 result.error(
                     "initializeDefaultConfirmationScreen",
                     "payload must not be null",
@@ -361,12 +418,15 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                         requireNotNull(activeSession),
                         payload
                     ).getOrThrow()
+                    logMessage("Keyri initializeDefaultConfirmationScreen: success")
                     result.success(true)
-                } ?: result.error(
-                    "initializeDefaultConfirmationScreen",
-                    "To Use this method, make sure your host Activity extended from FlutterFragmentActivity",
-                    null
-                )
+                } ?: let {
+                    val message =
+                        "To Use this method, make sure your host Activity extended from FlutterFragmentActivity"
+
+                    logMessage("Keyri initializeDefaultConfirmationScreen: $message")
+                    result.error("initializeDefaultConfirmationScreen", message, null)
+                }
             }
         }
     }
@@ -379,12 +439,15 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     ) {
         keyriCoroutineScope("processLink", result::error).launch {
             if (link == null) {
+                logMessage("Keyri processLink: link must not be null")
                 result.error("processLink", "link must not be null", null)
             } else if (payload == null) {
+                logMessage("Keyri processLink: payload must not be null")
                 result.error("processLink", "payload must not be null", null)
             } else {
                 (activity as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                    keyri.processLink(fm, Uri.parse(link), payload, publicUserId)
+                    keyri.processLink(fm, Uri.parse(link), payload, publicUserId).getOrThrow()
+                    logMessage("Keyri processLink: success")
                     result.success(true)
                 }
             }
@@ -398,20 +461,23 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     ) {
         keyriCoroutineScope("confirmSession", result::error).launch {
             if (activeSession == null) {
+                logMessage("Keyri confirmSession: can't find session")
                 result.error("confirmSession", "Can't find session", null)
             } else if (payload == null) {
+                logMessage("Keyri confirmSession: payload must not be null")
                 result.error("confirmSession", "payload must not be null", null)
             } else {
                 requireNotNull(activeSession).confirm(
                     payload,
                     requireNotNull(activity),
                     trustNewBrowser
-                )
-                    .onSuccess {
-                        result.success(true)
-                    }.onFailure {
-                        result.error("confirmSession", it.message, null)
-                    }
+                ).onSuccess {
+                    logMessage("Keyri confirmSession: success")
+                    result.success(true)
+                }.onFailure {
+                    logMessage("Keyri confirmSession: ${it.message}")
+                    result.error("confirmSession", it.message, null)
+                }
             }
         }
     }
@@ -419,17 +485,25 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     private fun denySession(payload: String?, result: MethodChannel.Result) {
         keyriCoroutineScope("denySession", result::error).launch {
             if (activeSession == null) {
+                logMessage("Keyri denySession: can't find session")
                 result.error("denySession", "Can't find session", null)
             } else if (payload == null) {
+                logMessage("Keyri denySession: payload must not be null")
                 result.error("denySession", "payload must not be null", null)
             } else {
                 requireNotNull(activeSession).deny(payload, requireNotNull(activity)).onSuccess {
+                    logMessage("Keyri denySession: success")
                     result.success(true)
                 }.onFailure {
+                    logMessage("Keyri denySession: ${it.message}")
                     result.error("denySession", it.message, null)
                 }
             }
         }
+    }
+
+    private fun logMessage(message: String) {
+        Log.d(CHANNEL, message)
     }
 
     private fun keyriCoroutineScope(
@@ -437,7 +511,11 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         errorCallback: (errorCode: String, errorMessage: String, errorDetails: Any?) -> Unit
     ): CoroutineScope {
         val exceptionHandler = CoroutineExceptionHandler { _, e ->
-            errorCallback(methodName, e.message ?: "Error calling $methodName method", null)
+            val message = e.message ?: "Error calling $methodName method"
+
+            Log.e(CHANNEL, message, e)
+
+            errorCallback(methodName, message, null)
         }
 
         return CoroutineScope(Dispatchers.IO + exceptionHandler)

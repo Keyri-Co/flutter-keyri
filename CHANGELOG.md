@@ -32,3 +32,15 @@
 
 - Updated handling arguments on Android and iOS bridges
 - Extended example app
+
+## 1.4.5
+
+- Fixed FlutterMethodNotImplemented log
+
+## 1.4.6
+
+- Fixed example
+
+## 1.4.7
+
+- Added more logs on Android
