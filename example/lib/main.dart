@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +15,8 @@ const String appKey = "[Your app key here]"; // Change it before launch
 const String? publicApiKey = null; // Change it before launch, optional
 const String? serviceEncryptionKey = null; // Change it before launch, optional
 const bool blockEmulatorDetection = true;
-const String? publicUserId = null; // Change it before launch, optional
+const String? publicUserId =
+    "example@example.com"; // Change it before launch, optional
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -54,6 +56,8 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
             button(_easyKeyriAuth, 'Easy Keyri Auth'),
             button(_customUI, 'Custom UI'),
             button(_sendEvent, 'Send event'),
+            button(_login, 'Login example'),
+            button(_register, 'Registration example'),
             button(_generateAssociationKey, 'Generate association key'),
             button(_getAssociationKey, 'Get association key'),
             button(_removeAssociationKey, 'Remove association key'),
@@ -64,6 +68,54 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
         ),
       ),
     );
+  }
+
+  Future<Map<String, Object?>> _login() async {
+    String? publicKey =
+        await keyri.getAssociationKey(publicUserId: publicUserId);
+
+    if (publicKey != null) {
+      String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+
+      String random = _randomHexString(16);
+      Codec<String, String> stringToBase64 = utf8.fuse(base64);
+      String nonce = stringToBase64.encode(random);
+
+      String timestampNonce = "${timestamp}_$nonce";
+
+      String? signature = await keyri.generateUserSignature(
+          publicUserId: publicUserId, data: timestampNonce);
+
+      return LoginResult(timestampNonce, signature!, publicKey, publicUserId!)
+          .toJson();
+    } else {
+      throw Exception('$publicUserId does not exists on the device');
+    }
+  }
+
+  Future<Map<String, Object?>> _register() async {
+    String? publicKey =
+        await keyri.getAssociationKey(publicUserId: publicUserId);
+
+    if (publicKey == null) {
+      publicKey =
+          await keyri.generateAssociationKey(publicUserId: publicUserId);
+
+      return RegisterResult(publicKey!, publicUserId!).toJson();
+    } else {
+      throw Exception('$publicUserId already exists');
+    }
+  }
+
+  String _randomHexString(int length) {
+    Random random = Random();
+    StringBuffer stringBuffer = StringBuffer();
+
+    for (var i = 0; i < length; i++) {
+      stringBuffer.write(random.nextInt(16).toRadixString(16));
+    }
+
+    return stringBuffer.toString();
   }
 
   void _generateAssociationKey() {
@@ -269,5 +321,34 @@ class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
   void _showMessage(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class LoginResult {
+  String timestampNonce;
+  String signature;
+  String publicKey;
+  String userId;
+
+  LoginResult(this.timestampNonce, this.signature, this.publicKey, this.userId);
+
+  Map<String, Object?> toJson() {
+    return {
+      'timestamp_nonce': timestampNonce,
+      'signature': signature,
+      'publicKey': publicKey,
+      'userId': userId
+    };
+  }
+}
+
+class RegisterResult {
+  String publicKey;
+  String userId;
+
+  RegisterResult(this.publicKey, this.userId);
+
+  Map<String, Object?> toJson() {
+    return {'publicKey': publicKey, 'userId': userId};
   }
 }
