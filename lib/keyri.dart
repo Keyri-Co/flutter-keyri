@@ -1,7 +1,9 @@
 import 'package:keyri_v3/fingerprint_event_response.dart';
+import 'package:keyri_v3/register_object.dart';
 import 'package:keyri_v3/session.dart';
 
 import 'keyri_fingerprint_event.dart';
+import 'login_object.dart';
 import 'src/keyri_platform_interface.dart';
 
 ///
@@ -89,6 +91,18 @@ class Keyri {
   /// Returns Future of [Session] object with Risk attributes (needed to show confirmation screen) or error.
   Future<Session> initiateQrSession(String sessionId, {String? publicUserId}) {
     return KeyriPlatform.instance.initiateQrSession(sessionId, publicUserId);
+  }
+
+  /// Call it to create [LoginObject] for login.
+  /// Returns Future of [LoginObject] object or error.
+  Future<LoginObject> login({String? publicUserId}) {
+    return KeyriPlatform.instance.login(publicUserId);
+  }
+
+  /// Call it to create [RegisterObject] for login.
+  /// Returns Future of [RegisterObject] object or error.
+  Future<RegisterObject> register({String? publicUserId}) {
+    return KeyriPlatform.instance.register(publicUserId);
   }
 
   /// Call it to show Confirmation screen with default UI.

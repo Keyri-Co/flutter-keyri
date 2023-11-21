@@ -4,6 +4,8 @@ import 'package:keyri_v3/fingerprint_event_response.dart';
 import 'package:keyri_v3/session.dart';
 
 import '../keyri_fingerprint_event.dart';
+import '../login_object.dart';
+import '../register_object.dart';
 import 'keyri_platform_interface.dart';
 
 /// An implementation of [KeyriPlatform] that uses method channels.
@@ -121,6 +123,22 @@ class MethodChannelKeyri extends KeyriPlatform {
         {'sessionId': sessionId, 'publicUserId': publicUserId});
 
     return Session.fromJson(sessionObject);
+  }
+
+  @override
+  Future<LoginObject> login(String? publicUserId) async {
+    dynamic loginObject = await methodChannel
+        .invokeMethod<dynamic>('login', {'publicUserId': publicUserId});
+
+    return LoginObject.fromJson(loginObject);
+  }
+
+  @override
+  Future<RegisterObject> register(String? publicUserId) async {
+    dynamic registerObject = await methodChannel
+        .invokeMethod<dynamic>('register', {'publicUserId': publicUserId});
+
+    return RegisterObject.fromJson(registerObject);
   }
 
   @override

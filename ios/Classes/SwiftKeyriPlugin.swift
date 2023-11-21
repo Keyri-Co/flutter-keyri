@@ -289,6 +289,46 @@ public class SwiftKeyriPlugin: NSObject, FlutterPlugin {
             errorArgumentsResult(argumentName: "call.arguments", result: result)
         }
     }
+
+    private func login(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        logMessage(message: "Keyri: login called")
+
+        if let args = call.arguments as? [String: Any] {
+            let publicUserId = args["publicUserId"] as? String
+
+            keyri?.login(publicUserId: publicUserId) { loginResult in
+                switch loginResult {
+                case .failure(let error):
+                    self.errorResult(error: error, result: result)
+                case .success(let loginObject):
+                    self.logMessage(message: "Keyri: login: \(String(describing: loginObject.asDictionary()))")
+                    result(loginObject.asDictionary())
+                }
+            }
+        } else {
+            errorArgumentsResult(argumentName: "call.arguments", result: result)
+        }
+    }
+
+    private func register(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        logMessage(message: "Keyri: register called")
+
+        if let args = call.arguments as? [String: Any] {
+            let publicUserId = args["publicUserId"] as? String
+
+            keyri?.register(publicUserId: publicUserId) { registerResult in
+                switch registerResult {
+                case .failure(let error):
+                    self.errorResult(error: error, result: result)
+                case .success(let registerObject):
+                    self.logMessage(message: "Keyri: register: \(String(describing: registerObject.asDictionary()))")
+                    result(registerObject.asDictionary())
+                }
+            }
+        } else {
+            errorArgumentsResult(argumentName: "call.arguments", result: result)
+        }
+    }
     
     private func initializeDefaultConfirmationScreen(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         logMessage(message: "Keyri: initializeDefaultConfirmationScreen called")

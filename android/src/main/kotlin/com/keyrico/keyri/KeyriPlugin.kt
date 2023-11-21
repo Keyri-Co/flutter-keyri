@@ -396,6 +396,34 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
+    private fun login(publicUserId: String?, result: MethodChannel.Result) {
+        keyriCoroutineScope("login", result::error).launch {
+            keyri.login(publicUserId).onSuccess { login ->
+                val loginObject = Gson().toJson(login)
+
+                logMessage("Keyri login: $loginObject")
+                result.success(loginObject)
+            }.onFailure {
+                logMessage("Keyri login: ${it.message}")
+                result.error("login", it.message, null)
+            }
+        }
+    }
+
+    private fun register(publicUserId: String?, result: MethodChannel.Result) {
+        keyriCoroutineScope("register", result::error).launch {
+            keyri.register(publicUserId).onSuccess { register ->
+                val registerObject = Gson().toJson(register)
+
+                logMessage("Keyri register: $registerObject")
+                result.success(registerObject)
+            }.onFailure {
+                logMessage("Keyri register: ${it.message}")
+                result.error("register", it.message, null)
+            }
+        }
+    }
+
     private fun initializeDefaultConfirmationScreen(
         payload: String?,
         result: MethodChannel.Result
