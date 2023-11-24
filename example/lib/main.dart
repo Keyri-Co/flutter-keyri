@@ -15,8 +15,7 @@ const String appKey = "[Your app key here]"; // Change it before launch
 const String? publicApiKey = null; // Change it before launch, optional
 const String? serviceEncryptionKey = null; // Change it before launch, optional
 const bool blockEmulatorDetection = true;
-const String? publicUserId =
-    "example@example.com"; // Change it before launch, optional
+const String? publicUserId = null; // Change it before launch, optional
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -56,8 +55,8 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
             button(_easyKeyriAuth, 'Easy Keyri Auth'),
             button(_customUI, 'Custom UI'),
             button(_sendEvent, 'Send event'),
-            button(_login, 'Login example'),
-            button(_register, 'Registration example'),
+            button(_login, 'Login object example'),
+            button(_register, 'Registration object example'),
             button(_generateAssociationKey, 'Generate association key'),
             button(_getAssociationKey, 'Get association key'),
             button(_removeAssociationKey, 'Remove association key'),
@@ -70,7 +69,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
     );
   }
 
-  Future<Map<String, Object?>> _login() async {
+  Future<void> _login() async {
     String? publicKey =
         await keyri.getAssociationKey(publicUserId: publicUserId);
 
@@ -86,14 +85,22 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
       String? signature = await keyri.generateUserSignature(
           publicUserId: publicUserId, data: timestampNonce);
 
-      return LoginResult(timestampNonce, signature!, publicKey, publicUserId!)
-          .toJson();
+      if (publicUserId == null) {
+        _showMessage('Login result:\npublicUserId should not be null');
+      }
+
+      var loginResult =
+          LoginResult(timestampNonce, signature!, publicKey, publicUserId!)
+              .toJson();
+
+      _showMessage('Login result:\n$loginResult');
     } else {
-      throw Exception('$publicUserId does not exists on the device');
+      _showMessage(
+          'Login result:\n$publicUserId does not exists on the device');
     }
   }
 
-  Future<Map<String, Object?>> _register() async {
+  Future<void> _register() async {
     String? publicKey =
         await keyri.getAssociationKey(publicUserId: publicUserId);
 
@@ -101,9 +108,11 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
       publicKey =
           await keyri.generateAssociationKey(publicUserId: publicUserId);
 
-      return RegisterResult(publicKey!, publicUserId!).toJson();
+      var registerResult = RegisterResult(publicKey!, publicUserId!).toJson();
+
+      _showMessage('Register result:\n$registerResult');
     } else {
-      throw Exception('$publicUserId already exists');
+      _showMessage('Register result:\n$publicUserId already exists');
     }
   }
 

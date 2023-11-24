@@ -12,7 +12,7 @@ Pod::Spec.new do |spec|
   spec.author           = 'kulagin.andrew38@gmail.com'
 
   spec.platform = :ios, '14.0'
-  spec.source           = { :git => 'https://github.com/Keyri-Co/flutter-keyri.git', :tag => '#{s.version}' }
+  spec.source = { :git => 'https://github.com/Keyri-Co/flutter-keyri.git', :tag => '#{s.version}' }
 
   spec.source_files = 'Classes/**/*'
   spec.public_header_files = 'Classes/**/*.h'

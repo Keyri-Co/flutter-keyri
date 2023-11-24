@@ -9,13 +9,8 @@
 
 @end
 
-// TODO: Fix event type error
-// TODO: Use FlutterError to process errors and test it
-// TODO: Make methods ordering same on all platforms and in documentation
-
 @implementation KeyriPlugin
 
-// TODO: Need to double-check on EasyKeyriAuth results
 + (BOOL)requiresMainQueueSetup
 {
     return NO;
@@ -55,10 +50,10 @@
     } else if ([@"initiateQrSession" isEqualToString:call.method]) {
         [self initiateQrSession:call result:result];
         // TODO: Uncomment when available
-//    } else if ([@"login" isEqualToString:call.method]) {
-//        [self login:call result:result];
-//    } else if ([@"register" isEqualToString:call.method]) {
-//        [self register:call result:result];
+        //    } else if ([@"login" isEqualToString:call.method]) {
+        //        [self login:call result:result];
+        //    } else if ([@"register" isEqualToString:call.method]) {
+        //        [self register:call result:result];
     } else if ([@"initializeDefaultConfirmationScreen" isEqualToString:call.method]) {
         [self initializeDefaultConfirmationScreen:call result:result];
     } else if ([@"processLink" isEqualToString:call.method]) {
@@ -78,11 +73,7 @@
     id serviceEncryptionKeyValue = call.arguments[@"serviceEncryptionKey"];
 
     if (appKey == nil || ![appKey isKindOfClass:[NSString class]]) {
-        // TODO: Check returning in this way
-        // TODO: If not working -> add below 'return;'
-
-        // TODO: Test sending error
-        return result(@"You need to provide appKey");
+        return [self sendErrorResult:result errorMessage:@"You need to provide eventType"];
     }
 
     NSString *publicApiKey = [publicApiKeyValue isKindOfClass:[NSString class]] ? publicApiKeyValue : nil;
@@ -97,7 +88,7 @@
     id payload = call.arguments[@"payload"];
 
     if (payload == nil || ![payload isKindOfClass:[NSString class]]) {
-        return result(@"You need to provide payload");
+        return [self sendErrorResult:result errorMessage:@"You need to provide payload"];
     }
 
     NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
@@ -106,11 +97,8 @@
         __weak typeof (self) weakSelf = self;
         [self.keyri easyKeyriAuthWithPayload:payload publicUserId:publicUserId completion:^(BOOL success, NSError * _Nullable error) {
             typeof (self) strongSelf = weakSelf;
-            if (error != nil) {
-                return result(error);
-            }
 
-            result(@(success));
+            return [self sendResult:result forObject:@(success) error:error];
         }];
     });
 }
@@ -121,11 +109,8 @@
     NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
 
     [self.keyri generateAssociationKeyWithPublicUserId:publicUserId completion:^(NSString * _Nullable generatedKey, NSError * _Nullable error) {
-        if (generatedKey != nil) {
-            result(generatedKey);
-        } else {
-            result(error);
-        }
+
+        return [self sendResult:result forObject:generatedKey error:error];
     }];
 }
 
@@ -134,7 +119,7 @@
     id publicUserIdValue = call.arguments[@"publicUserId"];
 
     if (![dataValue isKindOfClass:[NSString class]]) {
-        return result(@"You need to provide valid data as a string");
+        return [self sendErrorResult:result errorMessage:@"You need to provide valid data as a string"];
     }
 
     NSString *dataString = (NSString *)dataValue;
@@ -142,35 +127,23 @@
     NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
 
     if (dataToSign == nil) {
-        return result(@"Failed to convert data to NSData");
+        return [self sendErrorResult:result errorMessage:@"Failed to convert data to NSData"];
     }
 
     [self.keyri generateUserSignatureWithPublicUserId:publicUserId data:dataToSign completion:^(NSString * _Nullable signatureResult, NSError * _Nullable signatureError) {
-        if (signatureResult != nil) {
-            result(signatureResult);
-        } else {
-            result(signatureError);
-        }
+        return [self sendResult:result forObject:signatureResult error:signatureError];
     }];
 }
 
 - (void)listAssociationKeys:(FlutterMethodCall*)call result:(FlutterResult)result {
     [self.keyri listAssociationKeysWithCompletion:^(NSDictionary<NSString *,NSString *> * _Nullable associationKeys, NSError * _Nullable error) {
-        if (associationKeys != nil) {
-            result(associationKeys);
-        } else {
-            result(error);
-        }
+        return [self sendResult:result forObject:associationKeys error:error];
     }];
 }
 
 - (void)listUniqueAccounts:(FlutterMethodCall*)call result:(FlutterResult)result {
     [self.keyri listUniqueAccountsWithCompletion:^(NSDictionary<NSString *,NSString *> * _Nullable associationKeys, NSError * _Nullable error) {
-        if (associationKeys != nil) {
-            result(associationKeys);
-        } else {
-            result(error);
-        }
+        return [self sendResult:result forObject:associationKeys error:error];
     }];
 }
 
@@ -180,11 +153,7 @@
     NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
 
     [self.keyri getAssociationKeyWithPublicUserId:publicUserId completion:^(NSString * _Nullable associationKey, NSError * _Nullable error) {
-        if (associationKey != nil) {
-            result(associationKey);
-        } else {
-            result(error);
-        }
+        return [self sendResult:result forObject:associationKey error:error];
     }];
 }
 
@@ -194,28 +163,31 @@
     NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
 
     if (publicUserId == nil || ![publicUserId isKindOfClass:[NSString class]]) {
-        return result(@"You need to provide publicUserId");
+        return [self sendErrorResult:result errorMessage:@"You need to provide publicUserId"];
     }
 
     [self.keyri removeAssociationKeyWithPublicUserId: publicUserId completion:^(NSError * _Nullable error) {
-        if (error != nil) {
-            result(error);
-        }
-
-        result(@(YES));
+        return [self sendResult:result forObject:@(YES) error:error];
     }];
 }
 
 - (void)sendEvent:(FlutterMethodCall*)call result:(FlutterResult)result {
-    // TODO: Process arguments (BOOL also)
-    id publicUserId = call.arguments[@"publicUserId"];
-    NSString *eventType = call.arguments[@"eventType"];
-    id success = call.arguments[@"success"];
+    id publicUserIdValue = call.arguments[@"publicUserId"];
+    id eventType = call.arguments[@"eventType"];
+    id successValue = call.arguments[@"success"];
 
-//    Boolean *success = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
+    NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
 
-    if (![eventType isKindOfClass:[NSString class]]) {
-        return result(@"You need to provide eventType");
+    BOOL success = NO;
+
+    if (successValue != nil || [successValue isKindOfClass:[NSNumber class]]) {
+        success = [successValue boolValue];
+    } else {
+        return [self sendErrorResult:result errorMessage:@"You need to provide success"];
+    }
+
+    if (eventType == nil || ![eventType isKindOfClass:[NSString class]]) {
+        return [self sendErrorResult:result errorMessage:@"You need to provide eventType"];
     }
 
     __weak typeof (self) weakSelf = self;
@@ -223,44 +195,44 @@
         typeof (self) strongSelf = weakSelf;
 
         if (error != nil) {
-            return result(error);
+            return result([FlutterError errorWithCode:@"1" message:error.localizedDescription details:nil]);
         }
 
         if (fingerprintResponse != nil) {
-            NSDictionary *dict = [strongSelf dictionaryWithPropertiesOfObject:fingerprintResponse];
-            result(dict);
+            return result([strongSelf dictionaryWithPropertiesOfObject:fingerprintResponse]);
         } else {
-            result(@"Fingerprint response is null");
+            return [self sendErrorResult:result errorMessage:@"Fingerprint response is null"];
         }
     }];
 }
 
 - (void)initiateQrSession:(FlutterMethodCall*)call result:(FlutterResult)result {
-    // TODO: Fix arguments
-    NSData *sessionId = call.arguments[@"sessionId"];
-    NSString *publicUserId = call.arguments[@"publicUserId"];
+    id sessionId = call.arguments[@"sessionId"];
+    id publicUserIdValue = call.arguments[@"publicUserId"];
 
-    if (sessionId == nil || ![sessionId isKindOfClass:[NSData class]]) {
-        return result(@"You need to provide sessionId");
+    if (sessionId == nil || ![sessionId isKindOfClass:[NSString class]]) {
+        return [self sendErrorResult:result errorMessage:@"You need to provide sessionId"];
     }
+
+    NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
 
     __weak typeof (self) weakSelf = self;
     [self.keyri initiateQrSessionWithSessionId:sessionId publicUserId:publicUserId completion:^(Session * _Nullable session, NSError * _Nullable error) {
         typeof (self) strongSelf = weakSelf;
 
         if (error != nil) {
-            return result(error);
+            return result([FlutterError errorWithCode:@"1" message:error.localizedDescription details:nil]);
         }
 
         if (session != nil) {
             strongSelf.activeSession = session;
-            NSDictionary *dict = [self dictionaryWithPropertiesOfObject:session];
-            result(dict);
+            return result( [self dictionaryWithPropertiesOfObject:session]);
         } else {
-            result(@"Session not found");
+            return [self sendErrorResult:result errorMessage:@"Session not found"];
         }
     }];
 }
+
 // TODO: Uncomment when available
 //- (void)login:(FlutterMethodCall*)call result:(FlutterResult)result {
 //    id publicUserIdValue = call.arguments[@"publicUserId"];
@@ -293,29 +265,26 @@
 //}
 
 - (void)initializeDefaultConfirmationScreen:(FlutterMethodCall*)call result:(FlutterResult)result {
-    // TODO: Fix arguments
+    id payload = call.arguments[@"payload"];
 
-    if (self.activeSession == nil) {
-        return result(@"Session not found");
+    if (payload == nil || ![payload isKindOfClass:[NSString class]]) {
+        return [self sendErrorResult:result errorMessage:@"You need to provide payload"];
     }
 
-    NSString *payload = call.arguments[@"payload"];
-
-    if (payload == nil || ![payload isKindOfClass:[NSData class]]) {
-        return result(@"You need to provide payload");
+    if (self.activeSession == nil) {
+        return [self sendErrorResult:result errorMessage:@"Session not found"];
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.keyri initializeDefaultConfirmationScreenWithSession:self.activeSession payload:payload completion:^(BOOL isApproved, NSError * _Nullable error) {
             if (isApproved) {
-                result(@(YES));
+                return result(@(YES));
             } else {
                 if (![error isEqual:nil]) {
                     if ([error.localizedDescription isEqualToString:@"Denied by user"]) {
-                        // TODO: false or no?
-                        result(@(false));
+                        return result(@(NO));
                     } else {
-                        return result(error);
+                        result(error);
                     }
                 }
             }
@@ -324,18 +293,20 @@
 }
 
 - (void)processLink:(FlutterMethodCall*)call result:(FlutterResult)result {
-    // TODO: Fix arguments
     id urlString = call.arguments[@"url"];
-    id publicUserId = call.arguments[@"publicUserId"];
+    id publicUserIdValue = call.arguments[@"publicUserId"];
     id payload = call.arguments[@"payload"];
 
-    if (![payload isKindOfClass:[NSString class]]) { return result(@"You need to provide payload"); }
-    if (![publicUserId isKindOfClass:[NSString class]]) { return result(@"You need to provide publicUserId"); }
-    if (![urlString isKindOfClass:[NSString class]]) { return result(@"You need to provide url"); }
+    NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
+
+    if (payload == nil || ![payload isKindOfClass:[NSString class]]) { return result(@"You need to provide payload"); }
+    if (urlString == nil || ![urlString isKindOfClass:[NSString class]]) { return result(@"You need to provide url"); }
 
     __weak typeof (self) weakSelf = self;
+
     [self.keyri processLinkWithUrl:[NSURL URLWithString:urlString] payload:payload publicUserId:publicUserId completion:^(BOOL success, NSError * _Nullable error) {
         typeof (self) strongSelf = weakSelf;
+
         if (error != nil) {
             return result(error);
         }
@@ -345,22 +316,26 @@
 }
 
 - (void)confirmSession:(FlutterMethodCall*)call result:(FlutterResult)result {
-    // TODO: Fix arguments
-
-    NSString *payload = call.arguments[@"payload"];
-    NSString *trustNewBrowser = call.arguments[@"trustNewBrowser"];
+    id payload = call.arguments[@"payload"];
+    id trustNewBrowserValue = call.arguments[@"trustNewBrowser"];
 
     if (payload == nil || ![payload isKindOfClass:[NSString class]]) {
         return result(@"You need to provide payload");
+    }
+
+    BOOL trustNewBrowser = NO;
+
+    if (trustNewBrowserValue != nil || [trustNewBrowserValue isKindOfClass:[NSNumber class]]) {
+        trustNewBrowser = [trustNewBrowserValue boolValue];
+    } else {
+        return result(@"You need to provide trustNewBrowser");
     }
 
     [self finishSession:payload isApproved:YES trustNewBrowser:trustNewBrowser result:result];
 }
 
 - (void)denySession:(FlutterMethodCall*)call result:(FlutterResult)result {
-    // TODO: Fix arguments
-
-    NSString *payload = call.arguments[@"payload"];
+    id payload = call.arguments[@"payload"];
 
     if (payload == nil || ![payload isKindOfClass:[NSString class]]) {
         return result(@"You need to provide payload");
@@ -372,19 +347,11 @@
 - (void)finishSession:(NSString *)payload isApproved:(BOOL)isApproved trustNewBrowser:(BOOL)trustNewBrowser result:(FlutterResult)result {
     if (isApproved) {
         [self.activeSession confirmWithPayload:payload trustNewBrowser:trustNewBrowser completion:^(NSError * _Nullable error) {
-            if (error == nil) {
-                result(@(YES));
-            } else {
-                result(error);
-            }
+            return [self sendResult:result forObject:@(YES) error:error];
         }];
     } else {
         [self.activeSession denyWithPayload:payload completion:^(NSError * _Nullable error) {
-            if (error == nil) {
-                result(@(YES));
-            } else {
-                result(error);
-            }
+            return [self sendResult:result forObject:@(YES) error:error];
         }];
     }
 }
@@ -412,6 +379,30 @@
     free(properties);
 
     return [NSDictionary dictionaryWithDictionary:dict];
+}
+
+- (void)sendResult:(FlutterResult)result forObject:(NSObject *)object error:(NSError *)error {
+    if (error != nil) {
+        result([FlutterError errorWithCode:@"1" message:error.localizedDescription details:nil]);
+    } else if (object == nil) {
+        result(nil);
+    } else {
+        result(object);
+    }
+}
+
+- (void)sendResult:(FlutterResult)result forObject:(NSObject *)object errorMessage:(NSString *)errorMessage {
+    if (errorMessage != nil) {
+        result([FlutterError errorWithCode:@"1" message:errorMessage details:nil]);
+    } else if (object == nil) {
+        result(nil);
+    } else {
+        result(object);
+    }
+}
+
+- (void)sendErrorResult:(FlutterResult)result errorMessage:(NSString *)errorMessage {
+    result([FlutterError errorWithCode:@"1" message:errorMessage details:nil]);
 }
 
 @end
