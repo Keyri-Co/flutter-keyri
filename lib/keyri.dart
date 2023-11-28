@@ -93,17 +93,18 @@ class Keyri {
     return KeyriPlatform.instance.initiateQrSession(sessionId, publicUserId);
   }
 
-  /// Call it to create [LoginObject] for login.
-  /// Returns Future of [LoginObject] object or error.
-  Future<LoginObject> login({String? publicUserId}) {
-    return KeyriPlatform.instance.login(publicUserId);
-  }
-
-  /// Call it to create [RegisterObject] for login.
-  /// Returns Future of [RegisterObject] object or error.
-  Future<RegisterObject> register({String? publicUserId}) {
-    return KeyriPlatform.instance.register(publicUserId);
-  }
+  // TODO: Uncomment when available
+  // /// Call it to create [LoginObject] for login.
+  // /// Returns Future of [LoginObject] object or error.
+  // Future<LoginObject> login({String? publicUserId}) {
+  //   return KeyriPlatform.instance.login(publicUserId);
+  // }
+  //
+  // /// Call it to create [RegisterObject] for login.
+  // /// Returns Future of [RegisterObject] object or error.
+  // Future<RegisterObject> register({String? publicUserId}) {
+  //   return KeyriPlatform.instance.register(publicUserId);
+  // }
 
   /// Call it to show Confirmation screen with default UI.
   Future<bool> initializeDefaultConfirmationScreen(String payload) {

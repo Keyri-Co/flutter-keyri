@@ -72,8 +72,9 @@
     id publicApiKeyValue = call.arguments[@"publicApiKey"];
     id serviceEncryptionKeyValue = call.arguments[@"serviceEncryptionKey"];
 
+    // TODO: Add blockEmulatorDetection argument
     if (appKey == nil || ![appKey isKindOfClass:[NSString class]]) {
-        return [self sendErrorResult:result errorMessage:@"You need to provide eventType"];
+        return [self sendErrorResult:result errorMessage:@"You need to provide appKey"];
     }
 
     NSString *publicApiKey = [publicApiKeyValue isKindOfClass:[NSString class]] ? publicApiKeyValue : nil;

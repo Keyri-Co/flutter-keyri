@@ -79,13 +79,14 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('initiateQrSession() has not been implemented.');
   }
 
-  Future<LoginObject> login(String? publicUserId) {
-    throw UnimplementedError('login() has not been implemented.');
-  }
-
-  Future<RegisterObject> register(String? publicUserId) {
-    throw UnimplementedError('register() has not been implemented.');
-  }
+  // TODO: Uncomment when available
+  // Future<LoginObject> login(String? publicUserId) {
+  //   throw UnimplementedError('login() has not been implemented.');
+  // }
+  //
+  // Future<RegisterObject> register(String? publicUserId) {
+  //   throw UnimplementedError('register() has not been implemented.');
+  // }
 
   Future<bool> initializeDefaultConfirmationScreen(String payload) {
     throw UnimplementedError(
