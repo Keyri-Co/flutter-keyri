@@ -3,8 +3,6 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../fingerprint_event_response.dart';
 import '../keyri_fingerprint_event.dart';
-import '../login_object.dart';
-import '../register_object.dart';
 import 'keyri_method_channel.dart';
 
 abstract class KeyriPlatform extends PlatformInterface {

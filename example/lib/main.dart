@@ -11,13 +11,11 @@ void main() {
   runApp(const MyApp());
 }
 
-// TODO: Undo this file
 const String appKey = "[Your app key here]"; // Change it before launch
 const String? publicApiKey = null; // Change it before launch, optional
 const String? serviceEncryptionKey = null; // Change it before launch, optional
 const bool blockEmulatorDetection = true;
 const String? publicUserId = null; // Change it before launch, optional
-
 
 TextEditingController usernameController = TextEditingController();
 
@@ -65,8 +63,6 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                   )),
-              // button(_easyKeyriAuth, 'Easy Keyri Auth'),
-              // button(_customUI, 'Custom UI'),
               button(_sendEvent, 'Send event'),
               button(_login, 'Keyri login'),
               button(_attach, 'Keyri attach'),
@@ -82,55 +78,6 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
       ),
     );
   }
-
-  // Future<void> _login() async {
-  //   String? publicKey =
-  //       await keyri.getAssociationKey(publicUserId: usernameController.text);
-  //
-  //   if (publicKey != null) {
-  //     String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-  //
-  //     String random = _randomHexString(16);
-  //     Codec<String, String> stringToBase64 = utf8.fuse(base64);
-  //     String nonce = stringToBase64.encode(random);
-  //
-  //     String timestampNonce = "${timestamp}_$nonce";
-  //
-  //     String? signature = await keyri.generateUserSignature(
-  //         publicUserId: usernameController.text, data: timestampNonce);
-  //
-  //     if (usernameController.text.isEmpty) {
-  //       _showMessage('Login result:\npublicUserId should not be null');
-  //     }
-  //
-  //     var loginResult = LoginResult(
-  //             timestampNonce, signature!, publicKey, usernameController.text)
-  //         .toJson();
-  //
-  //     _showMessage('Login result:\n$loginResult');
-  //   } else {
-  //     _showMessage(
-  //         'Login result:\n${usernameController.text} does not exists on the device');
-  //   }
-  // }
-  //
-  // Future<void> _register() async {
-  //   String? publicKey =
-  //       await keyri.getAssociationKey(publicUserId: usernameController.text);
-  //
-  //   if (publicKey == null) {
-  //     publicKey = await keyri.generateAssociationKey(
-  //         publicUserId: usernameController.text);
-  //
-  //     var registerResult =
-  //         RegisterResult(publicKey!, usernameController.text).toJson();
-  //
-  //     _showMessage('Register result:\n$registerResult');
-  //   } else {
-  //     _showMessage(
-  //         'Register result:\n${usernameController.text} already exists');
-  //   }
-  // }
 
   String _randomHexString(int length) {
     Random random = Random();
@@ -170,7 +117,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   void _removeAssociationKey() {
     String? userId = usernameController.text;
 
-    if (userId != null) {
+    if (userId.isNotEmpty) {
       keyri
           .removeAssociationKey(userId)
           .then((_) => _showMessage('Key removed'))
@@ -207,18 +154,12 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
       String timestampNonce = "${timestamp}_$nonce";
 
-      // TODO: Login
-      // const timestamp_nonce = `${Date.now()}${Date.now()}`;
-      // await Keyri.generateAssociationKey(email);
-      // const signature = await Keyri.generateUserSignature(timestamp_nonce, email);
-      // const payload = JSON.stringify({ timestamp_nonce, signature, email });
-      // const result = await Keyri.initializeDefaultConfirmationScreen(payload);
-
       String? signature = await keyri.generateUserSignature(
           publicUserId: usernameController.text, data: timestampNonce);
 
-      var loginResult = LoginResult(timestampNonce, signature!, usernameController.text)
-          .toJson();
+      var loginResult =
+          LoginResult(timestampNonce, signature!, usernameController.text)
+              .toJson();
 
       keyri
           .easyKeyriAuth(jsonEncode(loginResult),
@@ -240,50 +181,17 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
           publicUserId: usernameController.text);
 
       var registerResult =
-      RegisterResult(publicKey!, usernameController.text!).toJson();
+          RegisterResult(publicKey!, usernameController.text).toJson();
 
       keyri
           .easyKeyriAuth(jsonEncode(registerResult),
-          publicUserId: usernameController.text)
-          .then((authResult) =>
-          _onAuthResult(authResult == true ? true : false))
+              publicUserId: usernameController.text)
+          .then(
+              (authResult) => _onAuthResult(authResult == true ? true : false))
           .catchError((error, stackTrace) => _processError(error));
     } else {
       _showMessage("Account already exists");
     }
-  }
-
-  void _easyKeyriAuth() async {
-    // TODO Attach
-    // const publicKey = await Keyri.generateAssociationKey(email);
-    // const payload = JSON.stringify({ publicKey });
-    // updateAccountsList(); // update the list after new account registration
-    //
-    // const result = await Keyri.initializeDefaultConfirmationScreen(payload);
-
-    // TODO: Login
-    // const timestamp_nonce = `${Date.now()}${Date.now()}`;
-    // await Keyri.generateAssociationKey(email);
-    // const signature = await Keyri.generateUserSignature(timestamp_nonce, email);
-    // const payload = JSON.stringify({ timestamp_nonce, signature, email });
-    // const result = await Keyri.initializeDefaultConfirmationScreen(payload);
-
-    String? publicKey =
-        await keyri.getAssociationKey(publicUserId: usernameController.text);
-
-    // if (publicKey == null) {
-    publicKey = await keyri.generateAssociationKey(
-        publicUserId: usernameController.text);
-
-    var registerResult =
-        RegisterResult(publicKey!, usernameController.text!).toJson();
-
-    keyri
-        .easyKeyriAuth(jsonEncode(registerResult),
-            publicUserId: usernameController.text)
-        .then((authResult) => _onAuthResult(authResult == true ? true : false))
-        .catchError((error, stackTrace) => _processError(error));
-    // }
   }
 
   void _sendEvent() {
@@ -294,11 +202,6 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
             success: true)
         .then((fingerprintEventResponse) => _showMessage("Event sent"))
         .catchError((error, stackTrace) => _processError(error));
-  }
-
-  void _customUI() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const KeyriScannerAuthPage()));
   }
 
   void _processError(dynamic error) {
