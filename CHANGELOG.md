@@ -15,8 +15,10 @@
 
 ## 1.4.1
 
-- Updated Android SDK to [4.0.2](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.0.2)
-- Updated iOS SDK to [4.2.5](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.2.5)
+- Updated Android SDK
+  to [4.0.2](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.0.2)
+- Updated iOS SDK
+  to [4.2.5](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.2.5)
 - Improved iOS error handling
 - Fixed channel types
 
@@ -44,3 +46,8 @@
 ## 1.4.7
 
 - Added more logs on Android
+
+## 1.5.0
+
+- Changed Swift bridge implementation to Objective-C
+- Fixed **Lexical or Preprocessor Issue (Xcode): 'keyri_v3-Swift.h' file not found** error
