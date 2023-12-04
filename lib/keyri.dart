@@ -1,9 +1,6 @@
 import 'package:keyri_v3/fingerprint_event_response.dart';
-import 'package:keyri_v3/register_object.dart';
 import 'package:keyri_v3/session.dart';
-
 import 'keyri_fingerprint_event.dart';
-import 'login_object.dart';
 import 'src/keyri_platform_interface.dart';
 
 ///

@@ -50,7 +50,6 @@
 ## 1.5.0
 
 - Changed Swift bridge implementation to Objective-C
-- Added login and register methods
 - Fixed **Lexical or Preprocessor Issue (Xcode): 'keyri_v3-Swift.h' file not found** error
 
 ## 1.6.0
