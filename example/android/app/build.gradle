@@ -26,10 +26,10 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "com.keyri.keyri_example"
+    namespace "com.example.keyri_example"
 
     defaultConfig {
-        applicationId "com.keyri.keyri_example"
+        applicationId "com.example.keyri_example"
         minSdk 23
         targetSdk 33
         compileSdk 33

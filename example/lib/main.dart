@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keyri_v3/keyri.dart';
@@ -14,7 +12,6 @@ TextEditingController appKeyController = TextEditingController();
 TextEditingController publicApiKeyController = TextEditingController();
 TextEditingController serviceEncryptionKeyController = TextEditingController();
 TextEditingController usernameController = TextEditingController();
-String eventType = "visits";
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -38,6 +35,8 @@ class KeyriHomePage extends StatefulWidget {
 }
 
 class _KeyriHomePageState extends State<KeyriHomePage> {
+  EventType? _eventType = EventType.visits;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,53 +46,65 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextFormField(
-                  controller: appKeyController,
-                  decoration: InputDecoration(
-                    labelText: "Enter app key",
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  )),
-              TextFormField(
-                  controller: publicApiKeyController,
-                  decoration: InputDecoration(
-                    labelText: "Enter public API key",
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  )),
-              TextFormField(
-                  controller: serviceEncryptionKeyController,
-                  decoration: InputDecoration(
-                    labelText: "Enter service encryption key",
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  )),
-              const SizedBox(height: 30),
-              TextFormField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    labelText: "Enter username",
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  )),
-              DropdownButton<String>(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                // Adjust the horizontal padding as needed
+                child: Center(
+                  child: Column(
+                    children: [
+                      TextFormField(
+                          controller: appKeyController,
+                          decoration: InputDecoration(
+                            labelText: "Enter app key",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                          controller: publicApiKeyController,
+                          decoration: InputDecoration(
+                            labelText: "Enter public API key",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                          controller: serviceEncryptionKeyController,
+                          decoration: InputDecoration(
+                            labelText: "Enter service encryption key",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                      const SizedBox(height: 30),
+                      TextFormField(
+                          controller: usernameController,
+                          decoration: InputDecoration(
+                            labelText: "Enter username",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+              DropdownButton<EventType>(
                 items: EventType.values
-                    .map((etValue) => etValue.name)
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
+                    .map<DropdownMenuItem<EventType>>((EventType value) {
+                  return DropdownMenuItem<EventType>(
                     value: value,
-                    child: Text(value),
+                    child: Text(value.name),
                   );
                 }).toList(),
                 onChanged: (value) {
-                  if (value != null) {
-                    eventType = value;
-                  }
+                  setState(() {
+                    _eventType = value;
+                  });
                 },
+                value: _eventType,
               ),
               button(_sendEvent, 'Send event'),
               button(_login, 'Login'),
@@ -141,34 +152,17 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
     if (keyri == null) return;
 
-    String? publicKey =
-        await keyri.getAssociationKey(publicUserId: usernameController.text);
+    String? publicUserId = usernameController.text;
 
-    if (publicKey != null) {
-      String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-
-      String random = _randomHexString(16);
-      Codec<String, String> stringToBase64 = utf8.fuse(base64);
-      String nonce = stringToBase64.encode(random);
-
-      String timestampNonce = "${timestamp}_$nonce";
-
-      String? signature = await keyri.generateUserSignature(
-          publicUserId: usernameController.text, data: timestampNonce);
-
-      if (usernameController.text.isEmpty) {
-        _showMessage('Login result:\npublicUserId should not be null');
-      }
-
-      var loginResult = LoginResult(
-              timestampNonce, signature!, publicKey, usernameController.text)
-          .toJson();
-
-      _showMessage('Login result:\n$loginResult');
-    } else {
-      _showMessage(
-          'Login result:\n${usernameController.text} does not exists on the device');
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
     }
+
+    keyri
+        .login(publicUserId: publicUserId)
+        .then((loginObject) =>
+            _showMessage('Login object: ${json.encode(loginObject.toJson())}'))
+        .catchError((error, stackTrace) => _processError(error));
   }
 
   Future<void> _register() async {
@@ -176,32 +170,17 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
     if (keyri == null) return;
 
-    String? publicKey =
-        await keyri.getAssociationKey(publicUserId: usernameController.text);
+    String? publicUserId = usernameController.text;
 
-    if (publicKey == null) {
-      publicKey = await keyri.generateAssociationKey(
-          publicUserId: usernameController.text);
-
-      var registerResult =
-          RegisterResult(publicKey!, usernameController.text).toJson();
-
-      _showMessage('Register result:\n$registerResult');
-    } else {
-      _showMessage(
-          'Register result:\n${usernameController.text} already exists');
-    }
-  }
-
-  String _randomHexString(int length) {
-    Random random = Random();
-    StringBuffer stringBuffer = StringBuffer();
-
-    for (var i = 0; i < length; i++) {
-      stringBuffer.write(random.nextInt(16).toRadixString(16));
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
     }
 
-    return stringBuffer.toString();
+    keyri
+        .register(publicUserId: publicUserId)
+        .then((registerObject) => _showMessage(
+            'Register object: ${json.encode(registerObject.toJson())}'))
+        .catchError((error, stackTrace) => _processError(error));
   }
 
   void _generateAssociationKey() {
@@ -209,8 +188,14 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
     if (keyri == null) return;
 
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
     keyri
-        .generateAssociationKey(publicUserId: usernameController.text)
+        .generateAssociationKey(publicUserId: publicUserId)
         .then((key) => _showMessage('Key generated: $key'))
         .catchError((error, stackTrace) => _processError(error));
   }
@@ -220,8 +205,14 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
     if (keyri == null) return;
 
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
     keyri
-        .getAssociationKey(publicUserId: usernameController.text)
+        .getAssociationKey(publicUserId: publicUserId)
         .then((key) => _showMessage('Key: $key'))
         .catchError((error, stackTrace) => _processError(error));
   }
@@ -233,9 +224,15 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
 
     int timestamp = DateTime.now().millisecondsSinceEpoch;
 
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
     keyri
         .generateUserSignature(
-            publicUserId: usernameController.text, data: timestamp.toString())
+            publicUserId: publicUserId, data: timestamp.toString())
         .then((signature) => _showMessage('Signature: $signature'))
         .catchError((error, stackTrace) => _processError(error));
   }
@@ -279,16 +276,21 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
         .catchError((error, stackTrace) => _processError(error));
   }
 
-  void _sendEvent() {
+  void _sendEvent() async {
     Keyri? keyri = initKeyri();
 
     if (keyri == null) return;
 
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
     keyri
         .sendEvent(
             publicUserId: usernameController.text,
-            eventType: EventType.values
-                .firstWhere((element) => element.name == eventType),
+            eventType: _eventType ?? EventType.visits,
             success: true)
         .then((fingerprintEventResponse) => _showMessage("Event sent"))
         .catchError((error, stackTrace) => _processError(error));
@@ -316,34 +318,5 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
       onPressed: onPressedCallback,
       child: Text(text),
     );
-  }
-}
-
-class LoginResult {
-  String timestampNonce;
-  String signature;
-  String publicKey;
-  String userId;
-
-  LoginResult(this.timestampNonce, this.signature, this.publicKey, this.userId);
-
-  Map<String, Object?> toJson() {
-    return {
-      'timestamp_nonce': timestampNonce,
-      'signature': signature,
-      'publicKey': publicKey,
-      'userId': userId
-    };
-  }
-}
-
-class RegisterResult {
-  String publicKey;
-  String userId;
-
-  RegisterResult(this.publicKey, this.userId);
-
-  Map<String, Object?> toJson() {
-    return {'publicKey': publicKey, 'userId': userId};
   }
 }

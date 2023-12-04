@@ -8,6 +8,14 @@ class RegisterObject {
   final String userId;
 
   /// Conversion helper method.
+  Map<String, dynamic> toJson() {
+    return {
+      'publicKey': publicKey,
+      'userId': userId,
+    };
+  }
+
+  /// Conversion helper method.
   static RegisterObject fromJson(dynamic json) {
     dynamic jsonData = json;
 

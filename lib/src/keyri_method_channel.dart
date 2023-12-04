@@ -125,22 +125,21 @@ class MethodChannelKeyri extends KeyriPlatform {
     return Session.fromJson(sessionObject);
   }
 
-  // TODO: Uncomment when available
-  // @override
-  // Future<LoginObject> login(String? publicUserId) async {
-  //   dynamic loginObject = await methodChannel
-  //       .invokeMethod<dynamic>('login', {'publicUserId': publicUserId});
-  //
-  //   return LoginObject.fromJson(loginObject);
-  // }
-  //
-  // @override
-  // Future<RegisterObject> register(String? publicUserId) async {
-  //   dynamic registerObject = await methodChannel
-  //       .invokeMethod<dynamic>('register', {'publicUserId': publicUserId});
-  //
-  //   return RegisterObject.fromJson(registerObject);
-  // }
+  @override
+  Future<LoginObject> login(String? publicUserId) async {
+    dynamic loginObject = await methodChannel
+        .invokeMethod<dynamic>('login', {'publicUserId': publicUserId});
+
+    return LoginObject.fromJson(loginObject);
+  }
+
+  @override
+  Future<RegisterObject> register(String? publicUserId) async {
+    dynamic registerObject = await methodChannel
+        .invokeMethod<dynamic>('register', {'publicUserId': publicUserId});
+
+    return RegisterObject.fromJson(registerObject);
+  }
 
   @override
   Future<bool> initializeDefaultConfirmationScreen(String payload) async {
