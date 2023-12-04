@@ -51,3 +51,11 @@
 
 - Changed Swift bridge implementation to Objective-C
 - Fixed **Lexical or Preprocessor Issue (Xcode): 'keyri_v3-Swift.h' file not found** error
+
+## 1.6.0
+
+- Added `login` and `register` methods
+- Updated Android SDK
+  to [4.1.0](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.1.0)
+- Updated iOS SDK
+  to [4.3.0](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.3.0)

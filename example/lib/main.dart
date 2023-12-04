@@ -1,22 +1,16 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keyri_v3/keyri.dart';
 import 'package:keyri_v3/keyri_fingerprint_event.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-const String appKey = "[Your app key here]"; // Change it before launch
-const String? publicApiKey = null; // Change it before launch, optional
-const String? serviceEncryptionKey = null; // Change it before launch, optional
-const bool blockEmulatorDetection = true;
-const String? publicUserId = null; // Change it before launch, optional
-
+TextEditingController appKeyController = TextEditingController();
+TextEditingController publicApiKeyController = TextEditingController();
+TextEditingController serviceEncryptionKeyController = TextEditingController();
 TextEditingController usernameController = TextEditingController();
 
 class MyApp extends StatelessWidget {
@@ -41,10 +35,7 @@ class KeyriHomePage extends StatefulWidget {
 }
 
 class _KeyriHomePageState extends State<KeyriHomePage> {
-  Keyri keyri = Keyri(appKey,
-      publicApiKey: publicApiKey,
-      serviceEncryptionKey: serviceEncryptionKey,
-      blockEmulatorDetection: true);
+  EventType? _eventType = EventType.visits;
 
   @override
   Widget build(BuildContext context) {
@@ -55,17 +46,69 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextFormField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    labelText: "Enter username",
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  )),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                // Adjust the horizontal padding as needed
+                child: Center(
+                  child: Column(
+                    children: [
+                      TextFormField(
+                          controller: appKeyController,
+                          decoration: InputDecoration(
+                            labelText: "Enter app key",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                          controller: publicApiKeyController,
+                          decoration: InputDecoration(
+                            labelText: "Enter public API key",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                          controller: serviceEncryptionKeyController,
+                          decoration: InputDecoration(
+                            labelText: "Enter service encryption key",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                      const SizedBox(height: 30),
+                      TextFormField(
+                          controller: usernameController,
+                          decoration: InputDecoration(
+                            labelText: "Enter username",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+              DropdownButton<EventType>(
+                items: EventType.values
+                    .map<DropdownMenuItem<EventType>>((EventType value) {
+                  return DropdownMenuItem<EventType>(
+                    value: value,
+                    child: Text(value.name),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _eventType = value;
+                  });
+                },
+                value: _eventType,
+              ),
               button(_sendEvent, 'Send event'),
-              button(_login, 'Keyri login'),
-              button(_attach, 'Keyri attach'),
+              button(_login, 'Login'),
+              button(_register, 'Register'),
               button(_generateAssociationKey, 'Generate association key'),
               button(_getAssociationKey, 'Get association key'),
               button(_removeAssociationKey, 'Remove association key'),
@@ -79,42 +122,126 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
     );
   }
 
-  String _randomHexString(int length) {
-    Random random = Random();
-    StringBuffer stringBuffer = StringBuffer();
+  Keyri? initKeyri() {
+    var appKey = appKeyController.text;
+    String? publicApiKey = publicApiKeyController.text;
+    String? serviceEncryptionKey = serviceEncryptionKeyController.text;
 
-    for (var i = 0; i < length; i++) {
-      stringBuffer.write(random.nextInt(16).toRadixString(16));
+    if (appKey.isNotEmpty) {
+      if (publicApiKey.isEmpty) {
+        publicApiKey = null;
+      }
+
+      if (serviceEncryptionKey.isEmpty) {
+        serviceEncryptionKey = null;
+      }
+
+      return Keyri(appKey,
+          publicApiKey: publicApiKey,
+          serviceEncryptionKey: serviceEncryptionKey,
+          blockEmulatorDetection: true);
+    } else {
+      _showMessage('App key is required!');
     }
 
-    return stringBuffer.toString();
+    return null;
+  }
+
+  Future<void> _login() async {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
+    keyri
+        .login(publicUserId: publicUserId)
+        .then((loginObject) =>
+            _showMessage('Login object: ${json.encode(loginObject.toJson())}'))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
+  Future<void> _register() async {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
+    keyri
+        .register(publicUserId: publicUserId)
+        .then((registerObject) => _showMessage(
+            'Register object: ${json.encode(registerObject.toJson())}'))
+        .catchError((error, stackTrace) => _processError(error));
   }
 
   void _generateAssociationKey() {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
     keyri
-        .generateAssociationKey(publicUserId: usernameController.text)
+        .generateAssociationKey(publicUserId: publicUserId)
         .then((key) => _showMessage('Key generated: $key'))
         .catchError((error, stackTrace) => _processError(error));
   }
 
   void _getAssociationKey() {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
     keyri
-        .getAssociationKey(publicUserId: usernameController.text)
+        .getAssociationKey(publicUserId: publicUserId)
         .then((key) => _showMessage('Key: $key'))
         .catchError((error, stackTrace) => _processError(error));
   }
 
   void _generateSignature() {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
     int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
 
     keyri
         .generateUserSignature(
-            publicUserId: usernameController.text, data: timestamp.toString())
+            publicUserId: publicUserId, data: timestamp.toString())
         .then((signature) => _showMessage('Signature: $signature'))
         .catchError((error, stackTrace) => _processError(error));
   }
 
   void _removeAssociationKey() {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
     String? userId = usernameController.text;
 
     if (userId.isNotEmpty) {
@@ -128,6 +255,10 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   }
 
   void _listAssociationKeys() {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
     keyri
         .listAssociationKeys()
         .then((keys) => _showMessage(json.encode(keys)))
@@ -135,70 +266,31 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
   }
 
   void _listUniqueAccounts() {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
     keyri
         .listUniqueAccounts()
         .then((keys) => _showMessage(json.encode(keys)))
         .catchError((error, stackTrace) => _processError(error));
   }
 
-  void _login() async {
-    String? publicKey =
-        await keyri.getAssociationKey(publicUserId: usernameController.text);
+  void _sendEvent() async {
+    Keyri? keyri = initKeyri();
 
-    if (publicKey != null) {
-      String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    if (keyri == null) return;
 
-      String random = _randomHexString(16);
-      Codec<String, String> stringToBase64 = utf8.fuse(base64);
-      String nonce = stringToBase64.encode(random);
+    String? publicUserId = usernameController.text;
 
-      String timestampNonce = "${timestamp}_$nonce";
-
-      String? signature = await keyri.generateUserSignature(
-          publicUserId: usernameController.text, data: timestampNonce);
-
-      var loginResult =
-          LoginResult(timestampNonce, signature!, usernameController.text)
-              .toJson();
-
-      keyri
-          .easyKeyriAuth(jsonEncode(loginResult),
-              publicUserId: usernameController.text)
-          .then(
-              (authResult) => _onAuthResult(authResult == true ? true : false))
-          .catchError((error, stackTrace) => _processError(error));
-    } else {
-      _showMessage("Account does not exists");
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
     }
-  }
 
-  void _attach() async {
-    String? publicKey =
-        await keyri.getAssociationKey(publicUserId: usernameController.text);
-
-    if (publicKey == null) {
-      publicKey = await keyri.generateAssociationKey(
-          publicUserId: usernameController.text);
-
-      var registerResult =
-          RegisterResult(publicKey!, usernameController.text).toJson();
-
-      keyri
-          .easyKeyriAuth(jsonEncode(registerResult),
-              publicUserId: usernameController.text)
-          .then(
-              (authResult) => _onAuthResult(authResult == true ? true : false))
-          .catchError((error, stackTrace) => _processError(error));
-    } else {
-      _showMessage("Account already exists");
-    }
-  }
-
-  void _sendEvent() {
     keyri
         .sendEvent(
             publicUserId: usernameController.text,
-            eventType: EventType.visits,
+            eventType: _eventType ?? EventType.visits,
             success: true)
         .then((fingerprintEventResponse) => _showMessage("Event sent"))
         .catchError((error, stackTrace) => _processError(error));
@@ -209,14 +301,6 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
       _showMessage(error.message ?? "Error occurred");
     } else {
       _showMessage(error.toString());
-    }
-  }
-
-  void _onAuthResult(bool result) {
-    if (result) {
-      _showMessage('Successfully authenticated!');
-    } else {
-      _showMessage('Authentication failed');
     }
   }
 
@@ -234,132 +318,5 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
       onPressed: onPressedCallback,
       child: Text(text),
     );
-  }
-}
-
-class KeyriScannerAuthPage extends StatefulWidget {
-  const KeyriScannerAuthPage({Key? key}) : super(key: key);
-
-  @override
-  State<KeyriScannerAuthPage> createState() => _KeyriScannerAuthPageState();
-}
-
-class _KeyriScannerAuthPageState extends State<KeyriScannerAuthPage> {
-  bool _isLoading = false;
-
-  Keyri keyri = Keyri(appKey,
-      publicApiKey: publicApiKey,
-      serviceEncryptionKey: serviceEncryptionKey,
-      blockEmulatorDetection: true);
-
-  void onMobileScannerDetect(BarcodeCapture barcodes) {
-    if (barcodes.barcodes.isNotEmpty && !_isLoading) {
-      var barcode = barcodes.barcodes[0];
-
-      if (barcode.rawValue == null) {
-        debugPrint('Failed to scan Barcode');
-        return;
-      }
-
-      final String? code = barcode.rawValue;
-      debugPrint('Scanned barcode: $code');
-
-      if (code == null) return;
-
-      var sessionId = Uri.dataFromString(code).queryParameters['sessionId'];
-
-      if (sessionId == null) return;
-
-      setState(() {
-        _isLoading = true;
-      });
-
-      _onReadSessionId(sessionId);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 1,
-            child: _isLoading
-                ? const Center(
-                    child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [CircularProgressIndicator()]))
-                : MobileScanner(onDetect: onMobileScannerDetect),
-          )
-        ],
-      ),
-    );
-  }
-
-  Future<void> _onReadSessionId(String sessionId) async {
-    keyri
-        .initiateQrSession(sessionId, publicUserId: usernameController.text)
-        .then((session) => keyri
-            .initializeDefaultConfirmationScreen('Some payload')
-            .then((authResult) => _onAuthResult(authResult))
-            .catchError((error, stackTrace) => _onError(error.toString())))
-        .catchError((error, stackTrace) => _onError(error.toString()));
-  }
-
-  void _onError(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      setState(() {
-        _isLoading = false;
-      });
-    });
-  }
-
-  void _onAuthResult(bool result) {
-    if (result) {
-      _showMessage('Successfully authenticated!');
-    } else {
-      _showMessage('Authentication failed');
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
-}
-
-class LoginResult {
-  String timestampNonce;
-  String signature;
-  String email;
-
-  LoginResult(this.timestampNonce, this.signature, this.email);
-
-  Map<String, Object?> toJson() {
-    return {
-      'timestamp_nonce': timestampNonce,
-      'signature': signature,
-      'email': email,
-    };
-  }
-}
-
-class RegisterResult {
-  String publicKey;
-  String userId;
-
-  RegisterResult(this.publicKey, this.userId);
-
-  Map<String, Object?> toJson() {
-    return {'publicKey': publicKey, 'userId': userId};
   }
 }

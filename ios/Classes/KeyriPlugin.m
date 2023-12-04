@@ -49,11 +49,10 @@
         [self sendEvent:call result:result];
     } else if ([@"initiateQrSession" isEqualToString:call.method]) {
         [self initiateQrSession:call result:result];
-        // TODO: Uncomment when available
-        //    } else if ([@"login" isEqualToString:call.method]) {
-        //        [self login:call result:result];
-        //    } else if ([@"register" isEqualToString:call.method]) {
-        //        [self register:call result:result];
+    } else if ([@"login" isEqualToString:call.method]) {
+        [self login:call result:result];
+    } else if ([@"register" isEqualToString:call.method]) {
+        [self register:call result:result];
     } else if ([@"initializeDefaultConfirmationScreen" isEqualToString:call.method]) {
         [self initializeDefaultConfirmationScreen:call result:result];
     } else if ([@"processLink" isEqualToString:call.method]) {
@@ -71,16 +70,22 @@
     id appKey = call.arguments[@"appKey"];
     id publicApiKeyValue = call.arguments[@"publicApiKey"];
     id serviceEncryptionKeyValue = call.arguments[@"serviceEncryptionKey"];
+    id blockEmulatorDetectionValue = call.arguments[@"blockEmulatorDetection"];
 
-    // TODO: Add blockEmulatorDetection argument
     if (appKey == nil || ![appKey isKindOfClass:[NSString class]]) {
         return [self sendErrorResult:result errorMessage:@"You need to provide appKey"];
+    }
+
+    BOOL blockEmulatorDetection = YES;
+
+    if (blockEmulatorDetectionValue != nil || [blockEmulatorDetectionValue isKindOfClass:[NSNumber class]]) {
+        blockEmulatorDetection = [blockEmulatorDetectionValue boolValue];
     }
 
     NSString *publicApiKey = [publicApiKeyValue isKindOfClass:[NSString class]] ? publicApiKeyValue : nil;
     NSString *serviceEncryptionKey = [serviceEncryptionKeyValue isKindOfClass:[NSString class]] ? serviceEncryptionKeyValue : nil;
 
-    [self.keyri initializeKeyriWithAppKey:appKey publicAPIKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey];
+    [self.keyri initializeKeyriWithAppKey:publicApiKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey blockEmulatorDetection:blockEmulatorDetection];
     result(@(YES));
 }
 
@@ -227,43 +232,48 @@
 
         if (session != nil) {
             strongSelf.activeSession = session;
-            return result( [self dictionaryWithPropertiesOfObject:session]);
+            return result([self dictionaryWithPropertiesOfObject:session]);
         } else {
             return [self sendErrorResult:result errorMessage:@"Session not found"];
         }
     }];
 }
 
-// TODO: Uncomment when available
-//- (void)login:(FlutterMethodCall*)call result:(FlutterResult)result {
-//    id publicUserIdValue = call.arguments[@"publicUserId"];
-//
-//    NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
-//
-//    [self.keyri loginWithPublicUserId:publicUserId completion:^(NSString * _Nullable loginObject, NSError * _Nullable error) {
-//        if (loginObject != nil) {
-//            NSDictionary *dict = [self dictionaryWithPropertiesOfObject:loginObject];
-//            result(dict);
-//        } else {
-//            result(error);
-//        }
-//    }];
-//}
-//
-//- (void)register:(FlutterMethodCall*)call result:(FlutterResult)result {
-//    id publicUserIdValue = call.arguments[@"publicUserId"];
-//
-//    NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
-//
-//    [self.keyri registerWithPublicUserId:publicUserId completion:^(NSString * _Nullable registerObject, NSError * _Nullable error) {
-//        if (registerObject != nil) {
-//            NSDictionary *dict = [self dictionaryWithPropertiesOfObject:registerObject];
-//            result(dict);
-//        } else {
-//            result(error);
-//        }
-//    }];
-//}
+- (void)login:(FlutterMethodCall*)call result:(FlutterResult)result {
+    id publicUserIdValue = call.arguments[@"publicUserId"];
+
+    NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
+
+    [self.keyri loginWithPublicUserId:publicUserId completion:^(LoginObject * _Nullable loginObject, NSError * _Nullable error) {
+        if (error != nil) {
+            return result([FlutterError errorWithCode:@"1" message:error.localizedDescription details:nil]);
+        }
+
+        if (loginObject != nil) {
+            return result([self dictionaryWithPropertiesOfObject:loginObject]);
+        } else {
+            return [self sendErrorResult:result errorMessage:@"LoginObject is nil"];
+        }
+    }];
+}
+
+- (void)register:(FlutterMethodCall*)call result:(FlutterResult)result {
+    id publicUserIdValue = call.arguments[@"publicUserId"];
+
+    NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
+
+    [self.keyri registerWithPublicUserId:publicUserId completion:^(RegisterObject * _Nullable registerObject, NSError * _Nullable error) {
+        if (error != nil) {
+            return result([FlutterError errorWithCode:@"1" message:error.localizedDescription details:nil]);
+        }
+
+        if (registerObject != nil) {
+            return result([self dictionaryWithPropertiesOfObject:registerObject]);
+        } else {
+            return [self sendErrorResult:result errorMessage:@"RegisterObject is nil"];
+        }
+    }];
+}
 
 - (void)initializeDefaultConfirmationScreen:(FlutterMethodCall*)call result:(FlutterResult)result {
     id payload = call.arguments[@"payload"];

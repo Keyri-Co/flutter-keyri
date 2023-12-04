@@ -18,7 +18,7 @@ Pod::Spec.new do |spec|
   spec.public_header_files = 'Classes/**/*.h'
 
   spec.dependency 'Flutter'
-  spec.dependency 'keyri-pod', '~> 4.2.5'
+  spec.dependency 'keyri-pod', '~> 4.3.0'
 
   # Flutter.framework does not contain a i386 slice.
   spec.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
