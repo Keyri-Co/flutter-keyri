@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:keyri_v3/fingerprint_event_response.dart';
 import 'package:keyri_v3/session.dart';
 import '../keyri_fingerprint_event.dart';
+import '../login_object.dart';
+import '../register_object.dart';
 import 'keyri_platform_interface.dart';
 
 /// An implementation of [KeyriPlatform] that uses method channels.
