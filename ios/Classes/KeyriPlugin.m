@@ -17,9 +17,7 @@
 }
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    FlutterMethodChannel* channel = [FlutterMethodChannel
-            methodChannelWithName:@"keyri"
-                  binaryMessenger:[registrar messenger]];
+    FlutterMethodChannel* channel = [FlutterMethodChannel methodChannelWithName:@"keyri" binaryMessenger:[registrar messenger]];
     KeyriPlugin* instance = [[KeyriPlugin alloc] init];
 
     instance.keyri = [[KeyriObjC alloc] init];
@@ -85,7 +83,7 @@
     NSString *publicApiKey = [publicApiKeyValue isKindOfClass:[NSString class]] ? publicApiKeyValue : nil;
     NSString *serviceEncryptionKey = [serviceEncryptionKeyValue isKindOfClass:[NSString class]] ? serviceEncryptionKeyValue : nil;
 
-    [self.keyri initializeKeyriWithAppKey:publicApiKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey blockEmulatorDetection:blockEmulatorDetection];
+    [self.keyri initializeKeyriWithAppKey:appKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey blockEmulatorDetection:blockEmulatorDetection];
     result(@(YES));
 }
 
@@ -115,7 +113,6 @@
     NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
 
     [self.keyri generateAssociationKeyWithPublicUserId:publicUserId completion:^(NSString * _Nullable generatedKey, NSError * _Nullable error) {
-
         return [self sendResult:result forObject:generatedKey error:error];
     }];
 }

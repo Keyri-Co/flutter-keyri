@@ -59,3 +59,14 @@
   to [4.1.0](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.1.0)
 - Updated iOS SDK
   to [4.3.0](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.3.0)
+
+## 1.6.3
+
+- Updated iOS SDK
+  to [4.4.1](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.4.1)
+- Updated Android SDK to [4.1.1](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk-source/releases/tag/4.1.1)
+- Fixed nullable publicUserId in `login` and `register` methods on Android
+- Updated proguard-rules to keep `LoginObject` and `RegisterObject` on Android
+- Fixed passing `appKey` on iOS initialize
+- Completely refactored Scanner and `easyKeyriAuth` function on iOS
+- Improved logging on iOS
