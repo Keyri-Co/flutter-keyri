@@ -60,7 +60,7 @@
 - Updated iOS SDK
   to [4.3.0](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.3.0)
 
-## 1.6.3
+## 1.6.1
 
 - Updated iOS SDK
   to [4.4.1](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.4.1)
