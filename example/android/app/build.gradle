@@ -31,8 +31,8 @@ android {
     defaultConfig {
         applicationId "com.example.keyri_example"
         minSdk 23
-        targetSdk 33
-        compileSdk 33
+        targetSdk 34
+        compileSdk 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

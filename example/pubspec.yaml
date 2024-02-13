@@ -1,22 +1,22 @@
 name: keyri_example
-version: 1.6.1
+version: 1.6.2
 description: Demonstrates how to use the Keyri plugin.
 publish_to: 'none'
 
 environment:
-  sdk: ">=2.18.0 <4.0.0"
+  sdk: ">=3.2.0 <4.0.0"
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.1.0
+  http: ^1.2.0
   keyri_v3:
     path: ../
   cupertino_icons: ^1.0.6
-  mobile_scanner: 3.4.1
+  mobile_scanner: 4.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 flutter:
   uses-material-design: true
