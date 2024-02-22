@@ -1,4 +1,5 @@
 import 'package:keyri_v3/fingerprint_event_response.dart';
+import 'package:keyri_v3/fingerprint_request.dart';
 import 'package:keyri_v3/register_object.dart';
 import 'package:keyri_v3/session.dart';
 import 'keyri_fingerprint_event.dart';
@@ -78,12 +79,18 @@ class Keyri {
   }
 
   /// Sends fingerprint event and event result for specified publicUserId's.
-  /// Return [FingerprintEventResponse] or error.
+  /// Returns [FingerprintEventResponse] or error.
   Future<FingerprintEventResponse> sendEvent(
       {String? publicUserId,
       required EventType eventType,
       required bool success}) {
     return KeyriPlatform.instance.sendEvent(publicUserId, eventType, success);
+  }
+
+  /// Creates and returns fingerprint event object.
+  /// Returns [FingerprintRequest] or error.
+  Future<FingerprintRequest> createFingerprint() {
+    return KeyriPlatform.instance.createFingerprint();
   }
 
   /// Call it after obtaining the sessionId from QR code or deep link.

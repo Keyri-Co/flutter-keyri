@@ -35,7 +35,7 @@ class KeyriHomePage extends StatefulWidget {
 }
 
 class _KeyriHomePageState extends State<KeyriHomePage> {
-  EventType? _eventType = EventType.visits;
+  final EventType _eventType = EventType.visits();
 
   @override
   Widget build(BuildContext context) {
@@ -90,21 +90,6 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
                     ],
                   ),
                 ),
-              ),
-              DropdownButton<EventType>(
-                items: EventType.values
-                    .map<DropdownMenuItem<EventType>>((EventType value) {
-                  return DropdownMenuItem<EventType>(
-                    value: value,
-                    child: Text(value.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _eventType = value;
-                  });
-                },
-                value: _eventType,
               ),
               button(_sendEvent, 'Send event'),
               button(_login, 'Login'),
@@ -290,7 +275,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
     keyri
         .sendEvent(
             publicUserId: usernameController.text,
-            eventType: _eventType ?? EventType.visits,
+            eventType: _eventType,
             success: true)
         .then((fingerprintEventResponse) => _showMessage("Event sent"))
         .catchError((error, stackTrace) => _processError(error));

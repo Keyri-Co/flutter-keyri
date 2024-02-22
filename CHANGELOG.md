@@ -1,3 +1,13 @@
+## 1.7.0
+
+- Updated iOS SDK
+  to [4.5.1](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.5.1)
+- Updated Android SDK
+  to [4.2.3](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.2.3)
+- Added new `createFingerprint` method
+- Fixed timestamp length on Android
+- Updated events structure and dded metadata field
+
 ## 1.6.2
 
 - Updated plugin_platform_interface and bump example dependencies
@@ -7,7 +17,7 @@
 - Updated iOS SDK
   to [4.4.1](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.4.1)
 - Updated Android SDK
-  to [4.1.1](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk-source/releases/tag/4.1.1)
+  to [4.1.1](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.1.1)
 - Fixed nullable publicUserId in `login` and `register` methods on Android
 - Updated proguard-rules to keep `LoginObject` and `RegisterObject` on Android
 - Fixed passing `appKey` on iOS initialize

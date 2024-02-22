@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:keyri_v3/fingerprint_event_response.dart';
+import 'package:keyri_v3/fingerprint_request.dart';
 import 'package:keyri_v3/session.dart';
 import '../keyri_fingerprint_event.dart';
 import '../login_object.dart';
@@ -108,10 +111,19 @@ class MethodChannelKeyri extends KeyriPlatform {
         await methodChannel.invokeMethod<dynamic>('sendEvent', {
       'publicUserId': publicUserId,
       'eventType': eventType.name,
+      'metadata': json.encode(eventType.metadata),
       'success': success.toString()
     });
 
     return FingerprintEventResponse.fromJson(fingerprintEventResponseObject);
+  }
+
+  @override
+  Future<FingerprintRequest> createFingerprint() async {
+    dynamic fingerprintRequestObject =
+        await methodChannel.invokeMethod<dynamic>('createFingerprint');
+
+    return FingerprintRequest.fromJson(fingerprintRequestObject);
   }
 
   @override

@@ -45,6 +45,8 @@
         [self removeAssociationKey:call result:result];
     } else if ([@"sendEvent" isEqualToString:call.method]) {
         [self sendEvent:call result:result];
+    } else if ([@"createFingerprint" isEqualToString:call.method]) {
+        [self sendEvent:call result:result];
     } else if ([@"initiateQrSession" isEqualToString:call.method]) {
         [self initiateQrSession:call result:result];
     } else if ([@"login" isEqualToString:call.method]) {
@@ -177,6 +179,7 @@
 - (void)sendEvent:(FlutterMethodCall*)call result:(FlutterResult)result {
     id publicUserIdValue = call.arguments[@"publicUserId"];
     id eventType = call.arguments[@"eventType"];
+    id metadata = call.arguments[@"metadata"];
     id successValue = call.arguments[@"success"];
 
     NSString *publicUserId = [publicUserIdValue isKindOfClass:[NSString class]] ? publicUserIdValue : nil;
@@ -193,8 +196,15 @@
         return [self sendErrorResult:result errorMessage:@"You need to provide eventType"];
     }
 
+    NSData *jsonData = [metadata dataUsingEncoding:NSUTF8StringEncoding];
+
+    NSError *error = nil;
+    NSDictionary *metadataDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&error];
+
+    EventType *event = [EventType customWithName:eventType metadata:metadataDictionary];
+
     __weak typeof (self) weakSelf = self;
-    [self.keyri sendEventWithPublicUserId:publicUserId eventType:eventType success:success completion:^(FingerprintResponse * _Nullable fingerprintResponse, NSError * _Nullable error) {
+    [self.keyri sendEventWithPublicUserId:publicUserId eventType:event success:success completion:^(FingerprintResponse * _Nullable fingerprintResponse, NSError * _Nullable error) {
         typeof (self) strongSelf = weakSelf;
 
         if (error != nil) {
@@ -205,6 +215,20 @@
             return result([strongSelf dictionaryWithPropertiesOfObject:fingerprintResponse]);
         } else {
             return [self sendErrorResult:result errorMessage:@"Fingerprint response is null"];
+        }
+    }];
+}
+
+- (void)createFingerprint:(FlutterMethodCall*)call result:(FlutterResult)result {
+    [self.keyri createFingerprintWithCompletion:^(FingerprintRequest * _Nullable fingerprint, NSError * _Nullable error) {
+        if (error != nil) {
+            return result([FlutterError errorWithCode:@"1" message:error.localizedDescription details:nil]);
+        }
+
+        if (fingerprint != nil) {
+            return result([self dictionaryWithPropertiesOfObject:fingerprint]);
+        } else {
+            return [self sendErrorResult:result errorMessage:@"FingerprintRequest is nil"];
         }
     }];
 }

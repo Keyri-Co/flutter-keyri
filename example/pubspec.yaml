@@ -1,5 +1,5 @@
 name: keyri_example
-version: 1.6.2
+version: 1.7.0
 description: Demonstrates how to use the Keyri plugin.
 publish_to: 'none'
 
@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.0
+  http: ^1.2.1
   keyri_v3:
     path: ../
   cupertino_icons: ^1.0.6

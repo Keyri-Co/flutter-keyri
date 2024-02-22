@@ -1,3 +1,4 @@
+import 'package:keyri_v3/fingerprint_request.dart';
 import 'package:keyri_v3/session.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -73,6 +74,10 @@ abstract class KeyriPlatform extends PlatformInterface {
   Future<FingerprintEventResponse> sendEvent(
       String? publicUserId, EventType eventType, bool success) {
     throw UnimplementedError('sendEvent() has not been implemented.');
+  }
+
+  Future<FingerprintRequest> createFingerprint() {
+    throw UnimplementedError('createFingerprint() has not been implemented.');
   }
 
   Future<Session> initiateQrSession(String sessionId, String? publicUserId) {

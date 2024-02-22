@@ -6,10 +6,11 @@ import android.util.Log
 import android.app.Activity
 import android.content.Intent
 import com.google.gson.Gson
+import org.json.JSONObject
 import com.keyrico.keyrisdk.Keyri
 import com.keyrico.scanner.easyKeyriAuth
 import com.keyrico.keyrisdk.exception.DenialException
-import com.keyrico.keyrisdk.sec.fraud.enums.EventType
+import com.keyrico.keyrisdk.sec.fraud.event.EventType
 import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.entity.session.Session
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -128,10 +129,16 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             "sendEvent" -> {
                 val publicUserId = arguments?.get("publicUserId")
                 val eventType = arguments?.get("eventType")
+                val metadata = arguments?.get("metadata")
                 val success = arguments?.get("success")?.toBoolean()
 
                 logMessage("Keyri: sendEvent called")
-                sendEvent(publicUserId, eventType, success, result)
+                sendEvent(publicUserId, eventType, metadata, success, result)
+            }
+
+            "createFingerprint" -> {
+                logMessage("Keyri: createFingerprint called")
+                createFingerprint(result)
             }
 
             "initiateQrSession" -> {
@@ -357,11 +364,13 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     private fun sendEvent(
         publicUserId: String?,
         eventType: String?,
+        metadata: String?,
         success: Boolean?,
         result: MethodChannel.Result
     ) {
         keyriCoroutineScope("sendEvent", result::error).launch {
-            val type = EventType.values().firstOrNull { it.type == eventType }
+            val jsonMetadata = metadata?.let(::JSONObject)
+            val type = eventType?.let { EventType.custom(it, jsonMetadata) }
 
             if (success == null) {
                 logMessage("Keyri sendEvent: success must not be null")
@@ -381,6 +390,20 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     logMessage("Keyri sendEvent: ${it.message}")
                     result.error("sendEvent", it.message, null)
                 }
+            }
+        }
+    }
+
+    private fun createFingerprint(result: MethodChannel.Result) {
+        keyriCoroutineScope("createFingerprint", result::error).launch {
+            keyri.createFingerprint().onSuccess { fingerprint ->
+                val fingerprintResponse = Gson().toJson(fingerprint)
+
+                logMessage("Keyri createFingerprint: $fingerprintResponse")
+                result.success(fingerprintResponse)
+            }.onFailure {
+                logMessage("Keyri createFingerprint: ${it.message}")
+                result.error("createFingerprint", it.message, null)
             }
         }
     }
