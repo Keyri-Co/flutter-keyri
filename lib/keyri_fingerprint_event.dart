@@ -23,7 +23,7 @@ class EventType {
 
   /// Returns Email change event.
   static EventType emailChange({Map<String, dynamic>? metadata}) =>
-      EventType("emailChange", metadata: metadata);
+      EventType("email_change", metadata: metadata);
 
   /// Returns Profile update event.
   static EventType profileUpdate({Map<String, dynamic>? metadata}) =>

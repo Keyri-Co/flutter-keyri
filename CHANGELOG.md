@@ -1,3 +1,10 @@
+## 1.7.1
+
+- Updated Android SDK
+  to [4.2.4](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.2.4)
+- Fixed `email_change` event declaration
+- Fixed proguard rule for `createFingerprint` method
+
 ## 1.7.0
 
 - Updated iOS SDK
