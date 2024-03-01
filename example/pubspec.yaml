@@ -1,10 +1,11 @@
 name: keyri_example
-version: 1.7.0
+version: 1.7.1
 description: Demonstrates how to use the Keyri plugin.
 publish_to: 'none'
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
+
 dependencies:
   flutter:
     sdk: flutter

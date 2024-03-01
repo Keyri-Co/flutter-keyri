@@ -379,7 +379,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 logMessage("Keyri sendEvent: eventType must not be null")
                 result.error("sendEvent", "eventType must not be null", null)
             } else {
-                val userId = if (publicUserId == null) "ANON" else publicUserId
+                val userId = publicUserId ?: "ANON"
 
                 keyri.sendEvent(userId, type, success).onSuccess { eventResponse ->
                     val eventResponse = Gson().toJson(eventResponse)
