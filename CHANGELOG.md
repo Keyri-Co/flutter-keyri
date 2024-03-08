@@ -1,3 +1,7 @@
+## 1.7.2
+
+- Fixed `sendEvent` issue on Android
+
 ## 1.7.1
 
 - Updated Android SDK

@@ -46,7 +46,7 @@
     } else if ([@"sendEvent" isEqualToString:call.method]) {
         [self sendEvent:call result:result];
     } else if ([@"createFingerprint" isEqualToString:call.method]) {
-        [self sendEvent:call result:result];
+        [self createFingerprint:call result:result];
     } else if ([@"initiateQrSession" isEqualToString:call.method]) {
         [self initiateQrSession:call result:result];
     } else if ([@"login" isEqualToString:call.method]) {
