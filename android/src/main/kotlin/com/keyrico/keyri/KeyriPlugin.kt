@@ -28,6 +28,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import java.lang.Exception
 
 class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     PluginRegistry.ActivityResultListener {
@@ -369,7 +370,12 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         result: MethodChannel.Result
     ) {
         keyriCoroutineScope("sendEvent", result::error).launch {
-            val jsonMetadata = metadata?.let(::JSONObject)
+            val jsonMetadata = try {
+                metadata?.let { JSONObject(it) }
+            } catch (e: Exception) {
+                null
+            }
+
             val type = eventType?.let { EventType.custom(it, jsonMetadata) }
 
             if (success == null) {
