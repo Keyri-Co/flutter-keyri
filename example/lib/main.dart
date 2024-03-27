@@ -94,6 +94,7 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
               button(_sendEvent, 'Send event'),
               button(_login, 'Login'),
               button(_register, 'Register'),
+              button(_getCorrectedTimestampSeconds, 'Get timestamp'),
               button(_generateAssociationKey, 'Generate association key'),
               button(_getAssociationKey, 'Get association key'),
               button(_removeAssociationKey, 'Remove association key'),
@@ -165,6 +166,23 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
         .register(publicUserId: publicUserId)
         .then((registerObject) => _showMessage(
             'Register object: ${json.encode(registerObject.toJson())}'))
+        .catchError((error, stackTrace) => _processError(error));
+  }
+
+  Future<void> _getCorrectedTimestampSeconds() async {
+    Keyri? keyri = initKeyri();
+
+    if (keyri == null) return;
+
+    String? publicUserId = usernameController.text;
+
+    if (publicUserId.isEmpty) {
+      publicUserId = null;
+    }
+
+    keyri
+        .getCorrectedTimestampSeconds()
+        .then((timestamp) => _showMessage('Timestamp: $timestamp'))
         .catchError((error, stackTrace) => _processError(error));
   }
 

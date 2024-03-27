@@ -153,6 +153,11 @@ class MethodChannelKeyri extends KeyriPlatform {
   }
 
   @override
+  Future<int> getCorrectedTimestampSeconds() async {
+    return await methodChannel.invokeMethod('getCorrectedTimestampSeconds');
+  }
+
+  @override
   Future<bool> initializeDefaultConfirmationScreen(String payload) async {
     return await methodChannel.invokeMethod<bool>(
             'initializeDefaultConfirmationScreen', {'payload': payload}) ??

@@ -111,6 +111,12 @@ class Keyri {
     return KeyriPlatform.instance.register(publicUserId);
   }
 
+  /// Call it to get timestamp synchronized with NTP.
+  /// Returns Future of [Long] object or error.
+  Future<int> getCorrectedTimestampSeconds() {
+    return KeyriPlatform.instance.getCorrectedTimestampSeconds();
+  }
+
   /// Call it to show Confirmation screen with default UI.
   Future<bool> initializeDefaultConfirmationScreen(String payload) {
     return KeyriPlatform.instance.initializeDefaultConfirmationScreen(payload);

@@ -54,8 +54,15 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val appKey = arguments?.get("appKey")
                 val publicApiKey = arguments?.get("publicApiKey")
                 val serviceEncryptionKey = arguments?.get("serviceEncryptionKey")
-                val blockEmulatorDetection =
-                    arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
+                val blockEmulatorDetection: Boolean = arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
+//                val blockRootDetection: Boolean = arguments?.get("blockRootDetection")?.toBoolean() ?: false
+//                val blockDangerousAppsDetection: Boolean = arguments?.get("blockDangerousAppsDetection")?.toBoolean() ?: false
+
+                // TODO: Uncommnet when available
+//                val blockTamperDetection: Boolean = arguments?.get("blockTamperDetection")?.toBoolean() ?: true
+//                val blockTamperDetection: Boolean = true
+
+//                val blockSwizzleDetection: Boolean = arguments?.get("blockSwizzleDetection")?.toBoolean() ?: false
 
                 logMessage("Keyri: initialize called")
                 initialize(
@@ -63,6 +70,10 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     publicApiKey,
                     serviceEncryptionKey,
                     blockEmulatorDetection,
+//                    blockRootDetection,
+//                    blockDangerousAppsDetection,
+//                    blockTamperDetection,
+//                    blockSwizzleDetection
                     result
                 )
             }
@@ -164,6 +175,11 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 register(publicUserId, result)
             }
 
+            "getCorrectedTimestampSeconds" -> {
+                logMessage("Keyri: getCorrectedTimestampSeconds called")
+                getCorrectedTimestampSeconds(result)
+            }
+
             "initializeDefaultConfirmationScreen" -> {
                 logMessage("Keyri: initializeDefaultConfirmationScreen called")
                 initializeDefaultConfirmationScreen(arguments?.get("payload"), result)
@@ -227,6 +243,10 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         publicApiKey: String?,
         serviceEncryptionKey: String?,
         blockEmulatorDetection: Boolean,
+//        blockRootDetection: Boolean,
+//        blockDangerousAppsDetection: Boolean,
+//        blockTamperDetection: Boolean,
+//        blockSwizzleDetection: Boolean,
         result: MethodChannel.Result
     ) {
         if (appKey == null) {
@@ -241,6 +261,14 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                         publicApiKey,
                         serviceEncryptionKey,
                         blockEmulatorDetection
+                        // TODO: Add impl
+//                        KeyriDetectionsConfig(
+//                            blockEmulatorDetection,
+//                            false,
+//                            false,
+//                            true,
+//                            false,
+//                        )
                     )
                 }
 
@@ -273,9 +301,11 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     appKey,
                     publicApiKey,
                     serviceEncryptionKey,
-                    blockEmulatorDetection,
+                    // TODO: Add impl
+//                    blockEmulatorDetection,
                     payload,
-                    publicUserId
+                    publicUserId,
+//                    detectionsConfig = KeyriDetectionsConfig()
                 )
 
                 easyKeyriAuthResult = result
@@ -464,6 +494,15 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 logMessage("Keyri register: ${it.message}")
                 result.error("register", it.message, null)
             }
+        }
+    }
+
+    private fun getCorrectedTimestampSeconds(result: MethodChannel.Result) {
+        keyriCoroutineScope("getCorrectedTimestampSeconds", result::error).launch {
+            val correctedTimestampSeconds = keyri.getCorrectedTimestampSeconds()
+
+            logMessage("Keyri getCorrectedTimestampSeconds: $correctedTimestampSeconds")
+            result.success(correctedTimestampSeconds)
         }
     }
 
