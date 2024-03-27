@@ -92,6 +92,10 @@ abstract class KeyriPlatform extends PlatformInterface {
     throw UnimplementedError('register() has not been implemented.');
   }
 
+  Future<int> getCorrectedTimestampSeconds() {
+    throw UnimplementedError('getCorrectedTimestampSeconds() has not been implemented.');
+  }
+
   Future<bool> initializeDefaultConfirmationScreen(String payload) {
     throw UnimplementedError(
         'initializeDefaultConfirmationScreen() has not been implemented.');

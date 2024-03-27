@@ -1,3 +1,13 @@
+## 1.8.0
+
+- Updated iOS SDK
+  to [4.6.0-alpha04](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.6.0-alpha04)
+- Updated Android SDK
+  to [4.3.0-alpha05](https://github.com/Keyri-Co/keyri-android-whitelabel-sdk/releases/tag/4.3.0-alpha05)
+- Fixed Keyri timestamps
+- Added `getCorrectedTimestampSeconds` method which checks time changes and get corrected NTP
+  timestamp
+
 ## 1.7.2
 
 - Fixed `sendEvent` issue on Android

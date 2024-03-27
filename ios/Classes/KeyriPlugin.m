@@ -53,6 +53,8 @@
         [self login:call result:result];
     } else if ([@"register" isEqualToString:call.method]) {
         [self register:call result:result];
+    } else if ([@"getCorrectedTimestampSeconds" isEqualToString:call.method]) {
+        [self getCorrectedTimestampSeconds:call result:result];
     } else if ([@"initializeDefaultConfirmationScreen" isEqualToString:call.method]) {
         [self initializeDefaultConfirmationScreen:call result:result];
     } else if ([@"processLink" isEqualToString:call.method]) {
@@ -71,6 +73,11 @@
     id publicApiKeyValue = call.arguments[@"publicApiKey"];
     id serviceEncryptionKeyValue = call.arguments[@"serviceEncryptionKey"];
     id blockEmulatorDetectionValue = call.arguments[@"blockEmulatorDetection"];
+    // TODO: Uncomment and add implementation
+//    id blockRootDetection = call.arguments[@"blockRootDetection"];
+//    id blockDangerousAppsDetection = call.arguments[@"blockDangerousAppsDetection"];
+//    id blockTamperDetection = call.arguments[@"blockTamperDetection"];
+//    id blockSwizzleDetection = call.arguments[@"blockSwizzleDetection"];
 
     if (appKey == nil || ![appKey isKindOfClass:[NSString class]]) {
         return [self sendErrorResult:result errorMessage:@"You need to provide appKey"];
@@ -84,6 +91,11 @@
 
     NSString *publicApiKey = [publicApiKeyValue isKindOfClass:[NSString class]] ? publicApiKeyValue : nil;
     NSString *serviceEncryptionKey = [serviceEncryptionKeyValue isKindOfClass:[NSString class]] ? serviceEncryptionKeyValue : nil;
+
+    // TODO: Add impl
+//    KeyriDetectionsConfig *config = [[KeyriDetectionsConfig alloc] initWithBlockEmulatorDetection: blockEmulatorDetection blockRootDetection:blockRootDetection blockDangerousAppsDetection:blockDangerousAppsDetection blockTamperDetection:blockTamperDetection blockSwizzleDetection:blockSwizzleDetection];
+//
+//    self.keyri = [[KeyriObjC alloc] initWithAppKey:appKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey detectionsConfig:config];
 
     [self.keyri initializeKeyriWithAppKey:appKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey blockEmulatorDetection:blockEmulatorDetection];
     result(@(YES));
@@ -293,6 +305,14 @@
         } else {
             return [self sendErrorResult:result errorMessage:@"RegisterObject is nil"];
         }
+    }];
+}
+
+- (void)getCorrectedTimestampSeconds:(FlutterMethodCall*)call result:(FlutterResult)result {
+    [self.keyri getCorrectedTimestampSecondsWithPubUserd:@"publicUserId" completion:^(double timestamp) {
+        NSInteger timeInSeconds = (NSInteger)ceil(timestamp);
+
+        return result(@(timeInSeconds));
     }];
 }
 
