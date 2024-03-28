@@ -1,3 +1,10 @@
+## 1.8.1
+
+- Updated iOS SDK
+  to [4.6.0-alpha05](https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/releases/tag/4.6.0-alpha05)
+- Fixed `sendEvent` function
+- Updated `getCorrectedTimestampSeconds` return type to int
+
 ## 1.8.0
 
 - Updated iOS SDK
