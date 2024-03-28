@@ -309,10 +309,8 @@
 }
 
 - (void)getCorrectedTimestampSeconds:(FlutterMethodCall*)call result:(FlutterResult)result {
-    [self.keyri getCorrectedTimestampSecondsWithPubUserd:@"publicUserId" completion:^(double timestamp) {
-        NSInteger timeInSeconds = (NSInteger)ceil(timestamp);
-
-        return result(@(timeInSeconds));
+    [self.keyri getCorrectedTimestampSecondsWithCompletion:^(NSInteger timestamp) {
+        return result(@(timestamp));
     }];
 }
 
