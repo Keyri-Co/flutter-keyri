@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:keyri_v3/KeyriDetectionsConfig.dart';
 import 'package:keyri_v3/keyri.dart';
+import 'package:keyri_v3/keyri_detections_config.dart';
 import 'package:keyri_v3/keyri_fingerprint_event.dart';
 
 void main() {

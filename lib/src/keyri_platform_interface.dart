@@ -1,9 +1,9 @@
-import 'package:keyri_v3/KeyriDetectionsConfig.dart';
 import 'package:keyri_v3/fingerprint_request.dart';
 import 'package:keyri_v3/session.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../fingerprint_event_response.dart';
+import '../keyri_detections_config.dart';
 import '../keyri_fingerprint_event.dart';
 import '../login_object.dart';
 import '../register_object.dart';
