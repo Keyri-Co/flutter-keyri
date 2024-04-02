@@ -1,3 +1,8 @@
+## 1.8.2
+
+- Deprecated Keyri constructor with `blockEmulatorDetection` param
+- Added new `Keyri.primary` constructor with `KeyriDetectionsConfig`
+
 ## 1.8.1
 
 - Updated iOS SDK

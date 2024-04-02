@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:keyri_v3/KeyriDetectionsConfig.dart';
 import 'package:keyri_v3/keyri.dart';
 import 'package:keyri_v3/keyri_fingerprint_event.dart';
 
@@ -122,10 +123,10 @@ class _KeyriHomePageState extends State<KeyriHomePage> {
         serviceEncryptionKey = null;
       }
 
-      return Keyri(appKey,
+      return Keyri.primary(appKey,
           publicApiKey: publicApiKey,
           serviceEncryptionKey: serviceEncryptionKey,
-          blockEmulatorDetection: true);
+          detectionsConfig: KeyriDetectionsConfig(blockTamperDetection: true));
     } else {
       _showMessage('App key is required!');
     }

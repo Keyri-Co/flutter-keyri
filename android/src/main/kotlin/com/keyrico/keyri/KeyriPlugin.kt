@@ -11,6 +11,7 @@ import com.keyrico.keyrisdk.Keyri
 import com.keyrico.scanner.easyKeyriAuth
 import com.keyrico.keyrisdk.exception.DenialException
 import com.keyrico.keyrisdk.sec.fraud.event.EventType
+import com.keyrico.keyrisdk.config.KeyriDetectionsConfig
 import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.entity.session.Session
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -54,26 +55,31 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val appKey = arguments?.get("appKey")
                 val publicApiKey = arguments?.get("publicApiKey")
                 val serviceEncryptionKey = arguments?.get("serviceEncryptionKey")
-                val blockEmulatorDetection: Boolean = arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
-//                val blockRootDetection: Boolean = arguments?.get("blockRootDetection")?.toBoolean() ?: false
-//                val blockDangerousAppsDetection: Boolean = arguments?.get("blockDangerousAppsDetection")?.toBoolean() ?: false
+                val blockEmulatorDetection: Boolean =
+                    arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
+                val blockRootDetection: Boolean =
+                    arguments?.get("blockRootDetection")?.toBoolean() ?: false
+                val blockDangerousAppsDetection: Boolean =
+                    arguments?.get("blockDangerousAppsDetection")?.toBoolean() ?: false
+                val blockTamperDetection: Boolean =
+                    arguments?.get("blockTamperDetection")?.toBoolean() ?: true
+                val blockSwizzleDetection: Boolean =
+                    arguments?.get("blockSwizzleDetection")?.toBoolean() ?: false
 
-                // TODO: Uncommnet when available
-//                val blockTamperDetection: Boolean = arguments?.get("blockTamperDetection")?.toBoolean() ?: true
-//                val blockTamperDetection: Boolean = true
-
-//                val blockSwizzleDetection: Boolean = arguments?.get("blockSwizzleDetection")?.toBoolean() ?: false
+                val keyriDetectionsConfig = KeyriDetectionsConfig(
+                    blockEmulatorDetection = blockEmulatorDetection,
+                    blockRootDetection = blockRootDetection,
+                    blockDangerousAppsDetection = blockDangerousAppsDetection,
+                    blockTamperDetection = blockTamperDetection,
+                    blockSwizzleDetection = blockSwizzleDetection,
+                )
 
                 logMessage("Keyri: initialize called")
                 initialize(
                     appKey,
                     publicApiKey,
                     serviceEncryptionKey,
-                    blockEmulatorDetection,
-//                    blockRootDetection,
-//                    blockDangerousAppsDetection,
-//                    blockTamperDetection,
-//                    blockSwizzleDetection
+                    keyriDetectionsConfig,
                     result
                 )
             }
@@ -82,8 +88,26 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 val appKey = arguments?.get("appKey")
                 val publicApiKey = arguments?.get("publicApiKey")
                 val serviceEncryptionKey = arguments?.get("serviceEncryptionKey")
-                val blockEmulatorDetection =
+
+                val blockEmulatorDetection: Boolean =
                     arguments?.get("blockEmulatorDetection")?.toBoolean() ?: true
+                val blockRootDetection: Boolean =
+                    arguments?.get("blockRootDetection")?.toBoolean() ?: false
+                val blockDangerousAppsDetection: Boolean =
+                    arguments?.get("blockDangerousAppsDetection")?.toBoolean() ?: false
+                val blockTamperDetection: Boolean =
+                    arguments?.get("blockTamperDetection")?.toBoolean() ?: true
+                val blockSwizzleDetection: Boolean =
+                    arguments?.get("blockSwizzleDetection")?.toBoolean() ?: false
+
+                val keyriDetectionsConfig = KeyriDetectionsConfig(
+                    blockEmulatorDetection = blockEmulatorDetection,
+                    blockRootDetection = blockRootDetection,
+                    blockDangerousAppsDetection = blockDangerousAppsDetection,
+                    blockTamperDetection = blockTamperDetection,
+                    blockSwizzleDetection = blockSwizzleDetection,
+                )
+
                 val payload = arguments?.get("payload")
                 val publicUserId = arguments?.get("publicUserId")
 
@@ -92,9 +116,9 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     appKey,
                     publicApiKey,
                     serviceEncryptionKey,
-                    blockEmulatorDetection,
                     payload,
                     publicUserId,
+                    keyriDetectionsConfig,
                     result
                 )
             }
@@ -242,11 +266,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         appKey: String?,
         publicApiKey: String?,
         serviceEncryptionKey: String?,
-        blockEmulatorDetection: Boolean,
-//        blockRootDetection: Boolean,
-//        blockDangerousAppsDetection: Boolean,
-//        blockTamperDetection: Boolean,
-//        blockSwizzleDetection: Boolean,
+        detectionsConfig: KeyriDetectionsConfig,
         result: MethodChannel.Result
     ) {
         if (appKey == null) {
@@ -255,21 +275,7 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         } else {
             activity?.let {
                 if (!this::keyri.isInitialized) {
-                    keyri = Keyri(
-                        it,
-                        appKey,
-                        publicApiKey,
-                        serviceEncryptionKey,
-                        blockEmulatorDetection
-                        // TODO: Add impl
-//                        KeyriDetectionsConfig(
-//                            blockEmulatorDetection,
-//                            false,
-//                            false,
-//                            true,
-//                            false,
-//                        )
-                    )
+                    keyri = Keyri(it, appKey, publicApiKey, serviceEncryptionKey, detectionsConfig)
                 }
 
                 logMessage("Keyri initialized")
@@ -282,9 +288,9 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         appKey: String?,
         publicApiKey: String?,
         serviceEncryptionKey: String?,
-        blockEmulatorDetection: Boolean,
         payload: String?,
         publicUserId: String?,
+        detectionsConfig: KeyriDetectionsConfig,
         result: MethodChannel.Result
     ) {
         if (appKey == null) {
@@ -301,11 +307,9 @@ class KeyriPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     appKey,
                     publicApiKey,
                     serviceEncryptionKey,
-                    // TODO: Add impl
-//                    blockEmulatorDetection,
                     payload,
                     publicUserId,
-//                    detectionsConfig = KeyriDetectionsConfig()
+                    detectionsConfig = detectionsConfig
                 )
 
                 easyKeyriAuthResult = result

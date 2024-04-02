@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:keyri_v3/KeyriDetectionsConfig.dart';
 import 'package:keyri_v3/fingerprint_event_response.dart';
 import 'package:keyri_v3/fingerprint_request.dart';
 import 'package:keyri_v3/session.dart';
@@ -17,13 +18,25 @@ class MethodChannelKeyri extends KeyriPlatform {
   final methodChannel = const MethodChannel('keyri');
 
   @override
-  Future<bool> initialize(String appKey, String? publicApiKey,
-      String? serviceEncryptionKey, bool? blockEmulatorDetection) async {
+  Future<bool> initialize(
+      String appKey,
+      String? publicApiKey,
+      String? serviceEncryptionKey,
+      KeyriDetectionsConfig detectionsConfig) async {
     return await methodChannel.invokeMethod<bool>('initialize', {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
-          'blockEmulatorDetection': (blockEmulatorDetection ?? true).toString()
+          'blockEmulatorDetection':
+              (detectionsConfig.blockEmulatorDetection).toString(),
+          'blockRootDetection':
+              (detectionsConfig.blockRootDetection).toString(),
+          'blockDangerousAppsDetection':
+              (detectionsConfig.blockDangerousAppsDetection).toString(),
+          'blockTamperDetection':
+              (detectionsConfig.blockTamperDetection).toString(),
+          'blockSwizzleDetection':
+              (detectionsConfig.blockSwizzleDetection).toString()
         }) ??
         false;
   }
@@ -33,14 +46,23 @@ class MethodChannelKeyri extends KeyriPlatform {
       String appKey,
       String? publicApiKey,
       String? serviceEncryptionKey,
-      bool? blockEmulatorDetection,
+      KeyriDetectionsConfig detectionsConfig,
       String payload,
       String? publicUserId) async {
     return await methodChannel.invokeMethod<bool>('easyKeyriAuth', {
           'appKey': appKey,
           'publicApiKey': publicApiKey,
           'serviceEncryptionKey': serviceEncryptionKey,
-          'blockEmulatorDetection': (blockEmulatorDetection ?? true).toString(),
+          'blockEmulatorDetection':
+              (detectionsConfig.blockEmulatorDetection).toString(),
+          'blockRootDetection':
+              (detectionsConfig.blockRootDetection).toString(),
+          'blockDangerousAppsDetection':
+              (detectionsConfig.blockDangerousAppsDetection).toString(),
+          'blockTamperDetection':
+              (detectionsConfig.blockTamperDetection).toString(),
+          'blockSwizzleDetection':
+              (detectionsConfig.blockSwizzleDetection).toString(),
           'payload': payload,
           'publicUserId': publicUserId
         }) ??
