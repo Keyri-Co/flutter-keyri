@@ -2,6 +2,7 @@ import 'package:keyri_v3/fingerprint_event_response.dart';
 import 'package:keyri_v3/fingerprint_request.dart';
 import 'package:keyri_v3/register_object.dart';
 import 'package:keyri_v3/session.dart';
+import 'keyri_detections_config.dart';
 import 'keyri_fingerprint_event.dart';
 import 'login_object.dart';
 import 'src/keyri_platform_interface.dart';
@@ -13,11 +14,13 @@ class Keyri {
   String _appKey = '';
   String? _publicApiKey;
   String? _serviceEncryptionKey;
-  bool _blockEmulatorDetection = true;
+  KeyriDetectionsConfig _detectionsConfig = KeyriDetectionsConfig();
 
   /// Pass required appKey for given Origin.
   /// Provide optional publicApiKey and serviceEncryptionKey parameters to use fraud prevention and mobile fingerprinting.
   /// Set blockEmulatorDetection parameter to false if you want to deny run your app on emulators, true by default.
+  @Deprecated(
+      "This constructor is deprecated. Use Keyri.primary constructor with KeyriDetectionsConfig param")
   Keyri(appKey,
       {String? publicApiKey,
       String? serviceEncryptionKey,
@@ -25,15 +28,36 @@ class Keyri {
     _appKey = appKey;
     _publicApiKey = publicApiKey;
     _serviceEncryptionKey = serviceEncryptionKey;
-    _blockEmulatorDetection = blockEmulatorDetection ?? true;
+
+    Keyri.primary(appKey,
+        publicApiKey: _publicApiKey,
+        serviceEncryptionKey: _serviceEncryptionKey,
+        detectionsConfig: KeyriDetectionsConfig(
+            blockEmulatorDetection: blockEmulatorDetection));
+  }
+
+  /// Pass required appKey for given Origin.
+  /// Provide optional publicApiKey and serviceEncryptionKey parameters to use fraud prevention and mobile fingerprinting.
+  /// Set blockEmulatorDetection parameter to false if you want to deny run your app on emulators, true by default.
+  Keyri.primary(appKey,
+      {String? publicApiKey,
+      String? serviceEncryptionKey,
+      KeyriDetectionsConfig? detectionsConfig}) {
+    _appKey = appKey;
+    _publicApiKey = publicApiKey;
+    _serviceEncryptionKey = serviceEncryptionKey;
+
+    if (detectionsConfig != null) {
+      _detectionsConfig = detectionsConfig;
+    }
 
     if (_appKey.isEmpty) {
       throw Exception('You need to specify appKey');
     }
 
     KeyriPlatform.instance
-        .initialize(_appKey, _publicApiKey, _serviceEncryptionKey,
-            _blockEmulatorDetection)
+        .initialize(
+            _appKey, _publicApiKey, _serviceEncryptionKey, _detectionsConfig)
         .then((isInitialized) => {
               if (!isInitialized)
                 {throw Exception('Failed to initialize Keyri')}
@@ -43,7 +67,7 @@ class Keyri {
   /// Call this method to launch in-app scanner and delegate authentication to SDK.
   Future<bool> easyKeyriAuth(String payload, {String? publicUserId}) {
     return KeyriPlatform.instance.easyKeyriAuth(_appKey, _publicApiKey,
-        _serviceEncryptionKey, _blockEmulatorDetection, payload, publicUserId);
+        _serviceEncryptionKey, _detectionsConfig, payload, publicUserId);
   }
 
   /// Returns Base64 public key for the specified publicUserId.

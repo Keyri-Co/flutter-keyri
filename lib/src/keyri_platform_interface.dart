@@ -3,6 +3,7 @@ import 'package:keyri_v3/session.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../fingerprint_event_response.dart';
+import '../keyri_detections_config.dart';
 import '../keyri_fingerprint_event.dart';
 import '../login_object.dart';
 import '../register_object.dart';
@@ -30,7 +31,7 @@ abstract class KeyriPlatform extends PlatformInterface {
   }
 
   Future<bool> initialize(String appKey, String? publicApiKey,
-      String? serviceEncryptionKey, bool? blockEmulatorDetection) {
+      String? serviceEncryptionKey, KeyriDetectionsConfig detectionsConfig) {
     throw UnimplementedError('initialize() has not been implemented.');
   }
 
@@ -38,7 +39,7 @@ abstract class KeyriPlatform extends PlatformInterface {
       String appKey,
       String? publicApiKey,
       String? serviceEncryptionKey,
-      bool? blockEmulatorDetection,
+      KeyriDetectionsConfig detectionsConfig,
       String payload,
       String? publicUserId) {
     throw UnimplementedError('easyKeyriAuth() has not been implemented.');

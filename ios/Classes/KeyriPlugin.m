@@ -20,7 +20,6 @@
     FlutterMethodChannel* channel = [FlutterMethodChannel methodChannelWithName:@"keyri" binaryMessenger:[registrar messenger]];
     KeyriPlugin* instance = [[KeyriPlugin alloc] init];
 
-    instance.keyri = [[KeyriObjC alloc] init];
     instance.activeSession = [[Session alloc] init];
 
     [registrar addMethodCallDelegate:instance channel:channel];
@@ -72,32 +71,23 @@
     id appKey = call.arguments[@"appKey"];
     id publicApiKeyValue = call.arguments[@"publicApiKey"];
     id serviceEncryptionKeyValue = call.arguments[@"serviceEncryptionKey"];
-    id blockEmulatorDetectionValue = call.arguments[@"blockEmulatorDetection"];
-    // TODO: Uncomment and add implementation
-//    id blockRootDetection = call.arguments[@"blockRootDetection"];
-//    id blockDangerousAppsDetection = call.arguments[@"blockDangerousAppsDetection"];
-//    id blockTamperDetection = call.arguments[@"blockTamperDetection"];
-//    id blockSwizzleDetection = call.arguments[@"blockSwizzleDetection"];
+
+    BOOL blockEmulatorDetection = getDetectionSetting(call, @"blockEmulatorDetection", YES);
+    BOOL blockRootDetection = getDetectionSetting(call, @"blockRootDetection", NO);
+    BOOL blockDangerousAppsDetection = getDetectionSetting(call, @"blockDangerousAppsDetection", NO);
+    BOOL blockTamperDetection = getDetectionSetting(call, @"blockTamperDetection", YES);
+    BOOL blockSwizzleDetection = getDetectionSetting(call, @"blockSwizzleDetection", NO);
 
     if (appKey == nil || ![appKey isKindOfClass:[NSString class]]) {
         return [self sendErrorResult:result errorMessage:@"You need to provide appKey"];
     }
 
-    BOOL blockEmulatorDetection = YES;
-
-    if (blockEmulatorDetectionValue != nil || [blockEmulatorDetectionValue isKindOfClass:[NSNumber class]]) {
-        blockEmulatorDetection = [blockEmulatorDetectionValue boolValue];
-    }
-
     NSString *publicApiKey = [publicApiKeyValue isKindOfClass:[NSString class]] ? publicApiKeyValue : nil;
     NSString *serviceEncryptionKey = [serviceEncryptionKeyValue isKindOfClass:[NSString class]] ? serviceEncryptionKeyValue : nil;
 
-    // TODO: Add impl
-//    KeyriDetectionsConfig *config = [[KeyriDetectionsConfig alloc] initWithBlockEmulatorDetection: blockEmulatorDetection blockRootDetection:blockRootDetection blockDangerousAppsDetection:blockDangerousAppsDetection blockTamperDetection:blockTamperDetection blockSwizzleDetection:blockSwizzleDetection];
-//
-//    self.keyri = [[KeyriObjC alloc] initWithAppKey:appKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey detectionsConfig:config];
+    KeyriDetectionsConfig *config = [[KeyriDetectionsConfig alloc] initWithBlockEmulatorDetection: blockEmulatorDetection blockRootDetection:blockRootDetection blockDangerousAppsDetection:blockDangerousAppsDetection blockTamperDetection:blockTamperDetection blockSwizzleDetection:blockSwizzleDetection];
 
-    [self.keyri initializeKeyriWithAppKey:appKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey blockEmulatorDetection:blockEmulatorDetection];
+    self.keyri = [[KeyriObjC alloc] initWithAppKey:appKey publicApiKey:publicApiKey serviceEncryptionKey:serviceEncryptionKey detectionsConfig:config];
     result(@(YES));
 }
 
@@ -404,6 +394,16 @@
             return [self sendResult:result forObject:@(YES) error:error];
         }];
     }
+}
+
+BOOL getDetectionSetting(FlutterMethodCall *call, NSString *key, BOOL defaultValue) {
+    NSNumber *value = call.arguments[key];
+
+    if (value != nil && [value isKindOfClass:[NSNumber class]]) {
+        return [value boolValue];
+    }
+
+    return defaultValue;
 }
 
 - (NSDictionary *)dictionaryWithPropertiesOfObject:(id)object
