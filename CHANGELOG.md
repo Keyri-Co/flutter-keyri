@@ -1,3 +1,8 @@
+## 1.8.3
+
+- Fixed `getCorrectedTimestampSeconds` timeout
+- Set `blockTamperDetection` to true by default in `KeyriDetectionsConfig`
+
 ## 1.8.2
 
 - Deprecated Keyri constructor with `blockEmulatorDetection` param

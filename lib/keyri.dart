@@ -136,7 +136,7 @@ class Keyri {
   }
 
   /// Call it to get timestamp synchronized with NTP.
-  /// Returns Future of [Long] object or error.
+  /// Returns Future of [int] or error.
   Future<int> getCorrectedTimestampSeconds() {
     return KeyriPlatform.instance.getCorrectedTimestampSeconds();
   }
