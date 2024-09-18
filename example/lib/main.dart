@@ -36,7 +36,7 @@ class KeyriHomePage extends StatefulWidget {
 }
 
 class _KeyriHomePageState extends State<KeyriHomePage> {
-  final EventType _eventType = EventType.visits();
+  final EventType _eventType = EventType.custom("custom");
 
   @override
   Widget build(BuildContext context) {

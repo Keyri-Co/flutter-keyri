@@ -1,3 +1,7 @@
+## 1.8.4
+
+- Fixed `Session` members visibility
+
 ## 1.8.3
 
 - Fixed `getCorrectedTimestampSeconds` timeout

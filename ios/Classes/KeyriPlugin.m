@@ -388,10 +388,14 @@
     if (isApproved) {
         [self.activeSession confirmWithPayload:payload trustNewBrowser:trustNewBrowser completion:^(NSError * _Nullable error) {
             return [self sendResult:result forObject:@(YES) error:error];
+        } completionHandler:^{
+            
         }];
     } else {
         [self.activeSession denyWithPayload:payload completion:^(NSError * _Nullable error) {
             return [self sendResult:result forObject:@(YES) error:error];
+        } completionHandler:^{
+            
         }];
     }
 }
